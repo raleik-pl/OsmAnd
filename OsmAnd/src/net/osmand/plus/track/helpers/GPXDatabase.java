@@ -1,13 +1,57 @@
 package net.osmand.plus.track.helpers;
 
 import static net.osmand.IndexConstants.GPX_INDEX_DIR;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_API_IMPORTED;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_AVG_ELEVATION;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_AVG_SPEED;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_COLOR;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_COLORING_TYPE;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_DIFF_ELEVATION_DOWN;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_DIFF_ELEVATION_UP;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_DIR;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_END_TIME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_FILE_CREATION_TIME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_FILE_LAST_MODIFIED_TIME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_FILE_LAST_UPLOADED_TIME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_GRADIENT_ALTITUDE_COLOR;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_GRADIENT_SLOPE_COLOR;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_GRADIENT_SPEED_COLOR;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_JOIN_SEGMENTS;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_MAX_ELEVATION;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_MAX_FILTER_ALTITUDE;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_MAX_FILTER_HDOP;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_MAX_FILTER_SPEED;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_MAX_SPEED;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_MIN_ELEVATION;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_MIN_FILTER_ALTITUDE;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_MIN_FILTER_SPEED;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_NAME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_NEAREST_CITY_NAME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_POINTS;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SHOW_ARROWS;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SHOW_AS_MARKERS;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SHOW_START_FINISH;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SMOOTHING_THRESHOLD;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SPLIT_INTERVAL;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SPLIT_TYPE;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_START_LAT;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_START_LON;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_START_TIME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_TIME_MOVING;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_TIME_SPAN;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_TOTAL_DISTANCE;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_TOTAL_DISTANCE_MOVING;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_TOTAL_TRACKS;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_WIDTH;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_WPT_CATEGORY_NAMES;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_WPT_POINTS;
 
 import android.util.Pair;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.osmand.PlatformUtil;
 import net.osmand.data.LatLon;
 import net.osmand.gpx.GPXTrackAnalysis;
 import net.osmand.gpx.GPXUtilities;
@@ -19,10 +63,14 @@ import net.osmand.plus.track.GradientScaleType;
 import net.osmand.plus.utils.AndroidDbUtils;
 import net.osmand.util.Algorithms;
 
+import org.apache.commons.logging.Log;
+import org.bouncycastle.util.Arrays;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,218 +78,54 @@ import java.util.Set;
 
 public class GPXDatabase {
 
+	public static final Log LOG = PlatformUtil.getLog(GPXDatabase.class);
+
 	private static final int DB_VERSION = 16;
 	private static final String DB_NAME = "gpx_database";
 
 	private static final String GPX_TABLE_NAME = "gpxTable";
-	private static final String GPX_COL_NAME = "fileName";
-	private static final String GPX_COL_DIR = "fileDir";
 	private static final String GPX_INDEX_NAME_DIR = "indexNameDir";
-
-	private static final String GPX_COL_TOTAL_DISTANCE = "totalDistance";
-	private static final String GPX_COL_TOTAL_TRACKS = "totalTracks";
-	private static final String GPX_COL_START_TIME = "startTime";
-	private static final String GPX_COL_END_TIME = "endTime";
-	private static final String GPX_COL_TIME_SPAN = "timeSpan";
-	private static final String GPX_COL_TIME_MOVING = "timeMoving";
-	private static final String GPX_COL_TOTAL_DISTANCE_MOVING = "totalDistanceMoving";
-
-	private static final String GPX_COL_DIFF_ELEVATION_UP = "diffElevationUp";
-	private static final String GPX_COL_DIFF_ELEVATION_DOWN = "diffElevationDown";
-	private static final String GPX_COL_AVG_ELEVATION = "avgElevation";
-	private static final String GPX_COL_MIN_ELEVATION = "minElevation";
-	private static final String GPX_COL_MAX_ELEVATION = "maxElevation";
-
-	private static final String GPX_COL_MAX_SPEED = "maxSpeed";
-	private static final String GPX_COL_AVG_SPEED = "avgSpeed";
-
-	private static final String GPX_COL_POINTS = "points";
-	private static final String GPX_COL_WPT_POINTS = "wptPoints";
-
-	private static final String GPX_COL_COLOR = "color";
-	private static final String GPX_COL_FILE_LAST_MODIFIED_TIME = "fileLastModifiedTime";
-	private static final String GPX_COL_FILE_LAST_UPLOADED_TIME = "fileLastUploadedTime";
-	private static final String GPX_COL_FILE_CREATION_TIME = "fileCreationTime";
-
-	private static final String GPX_COL_SPLIT_TYPE = "splitType";
-	private static final String GPX_COL_SPLIT_INTERVAL = "splitInterval";
-
-	private static final String GPX_COL_API_IMPORTED = "apiImported";
-
-	private static final String GPX_COL_WPT_CATEGORY_NAMES = "wptCategoryNames";
-
-	private static final String GPX_COL_SHOW_AS_MARKERS = "showAsMarkers";
-
-	private static final String GPX_COL_JOIN_SEGMENTS = "joinSegments";
-
-	private static final String GPX_COL_SHOW_ARROWS = "showArrows";
-
-	private static final String GPX_COL_SHOW_START_FINISH = "showStartFinish";
-
-	private static final String GPX_COL_WIDTH = "width";
-
-	private static final String GPX_COL_GRADIENT_SPEED_COLOR = "gradientSpeedColor";
-
-	private static final String GPX_COL_GRADIENT_ALTITUDE_COLOR = "gradientAltitudeColor";
-
-	private static final String GPX_COL_GRADIENT_SLOPE_COLOR = "gradientSlopeColor";
-
-	private static final String GPX_COL_COLORING_TYPE = "gradientScaleType";
-
-	private static final String GPX_COL_SMOOTHING_THRESHOLD = "smoothingThreshold";
-	private static final String GPX_COL_MIN_FILTER_SPEED = "minFilterSpeed";
-	private static final String GPX_COL_MAX_FILTER_SPEED = "maxFilterSpeed";
-	private static final String GPX_COL_MIN_FILTER_ALTITUDE = "minFilterAltitude";
-	private static final String GPX_COL_MAX_FILTER_ALTITUDE = "maxFilterAltitude";
-	private static final String GPX_COL_MAX_FILTER_HDOP = "maxFilterHdop";
-	private static final String GPX_COL_START_LAT = "startLat";
-	private static final String GPX_COL_START_LON = "startLon";
-	private static final String GPX_COL_NEAREST_CITY_NAME = "nearestCityName";
 
 	private static final String TMP_NAME_COLUMN_COUNT = "itemsCount";
 	private static final String TMP_NAME_COLUMN_NOT_NULL = "nonnull";
 
 	public static final long UNKNOWN_TIME_THRESHOLD = 10;
 
-	private static final String GPX_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS " + GPX_TABLE_NAME + " (" +
-			GPX_COL_NAME + " TEXT, " +
-			GPX_COL_DIR + " TEXT, " +
-			GPX_COL_TOTAL_DISTANCE + " double, " +
-			GPX_COL_TOTAL_TRACKS + " int, " +
-			GPX_COL_START_TIME + " long, " +
-			GPX_COL_END_TIME + " long, " +
-			GPX_COL_TIME_SPAN + " long, " +
-			GPX_COL_TIME_MOVING + " long, " +
-			GPX_COL_TOTAL_DISTANCE_MOVING + " double, " +
-
-			GPX_COL_DIFF_ELEVATION_UP + " double, " +
-			GPX_COL_DIFF_ELEVATION_DOWN + " double, " +
-			GPX_COL_AVG_ELEVATION + " double, " +
-			GPX_COL_MIN_ELEVATION + " double, " +
-			GPX_COL_MAX_ELEVATION + " double, " +
-
-			GPX_COL_MAX_SPEED + " double, " +
-			GPX_COL_AVG_SPEED + " double, " +
-
-			GPX_COL_POINTS + " int, " +
-			GPX_COL_WPT_POINTS + " int, " +
-			GPX_COL_COLOR + " TEXT, " +
-			GPX_COL_FILE_LAST_MODIFIED_TIME + " long, " +
-			GPX_COL_FILE_LAST_UPLOADED_TIME + " long, " +
-			GPX_COL_FILE_CREATION_TIME + " long, " +
-			GPX_COL_SPLIT_TYPE + " int, " +
-			GPX_COL_SPLIT_INTERVAL + " double, " +
-			GPX_COL_API_IMPORTED + " int, " + // 1 = true, 0 = false
-			GPX_COL_WPT_CATEGORY_NAMES + " TEXT, " +
-			GPX_COL_SHOW_AS_MARKERS + " int, " + // 1 = true, 0 = false
-			GPX_COL_JOIN_SEGMENTS + " int, " + // 1 = true, 0 = false
-			GPX_COL_SHOW_ARROWS + " int, " + // 1 = true, 0 = false
-			GPX_COL_SHOW_START_FINISH + " int, " + // 1 = true, 0 = false
-			GPX_COL_WIDTH + " TEXT, " +
-			GPX_COL_GRADIENT_SPEED_COLOR + " TEXT, " +
-			GPX_COL_GRADIENT_ALTITUDE_COLOR + " TEXT, " +
-			GPX_COL_GRADIENT_SLOPE_COLOR + " TEXT, " +
-			GPX_COL_COLORING_TYPE + " TEXT, " +
-			GPX_COL_SMOOTHING_THRESHOLD + " double, " +
-			GPX_COL_MIN_FILTER_SPEED + " double, " +
-			GPX_COL_MAX_FILTER_SPEED + " double, " +
-			GPX_COL_MIN_FILTER_ALTITUDE + " double, " +
-			GPX_COL_MAX_FILTER_ALTITUDE + " double, " +
-			GPX_COL_MAX_FILTER_HDOP + " double, " +
-			GPX_COL_START_LAT + " double, " +
-			GPX_COL_START_LON + " double, " +
-			GPX_COL_NEAREST_CITY_NAME + " TEXT);";
-
-	private static final String GPX_TABLE_SELECT = "SELECT " +
-			GPX_COL_NAME + ", " +
-			GPX_COL_DIR + "," +
-			GPX_COL_TOTAL_DISTANCE + ", " +
-			GPX_COL_TOTAL_TRACKS + ", " +
-			GPX_COL_START_TIME + ", " +
-			GPX_COL_END_TIME + ", " +
-			GPX_COL_TIME_SPAN + ", " +
-			GPX_COL_TIME_MOVING + ", " +
-			GPX_COL_TOTAL_DISTANCE_MOVING + ", " +
-			GPX_COL_DIFF_ELEVATION_UP + ", " +
-			GPX_COL_DIFF_ELEVATION_DOWN + ", " +
-			GPX_COL_AVG_ELEVATION + ", " +
-			GPX_COL_MIN_ELEVATION + ", " +
-			GPX_COL_MAX_ELEVATION + ", " +
-			GPX_COL_MAX_SPEED + ", " +
-			GPX_COL_AVG_SPEED + ", " +
-			GPX_COL_POINTS + ", " +
-			GPX_COL_WPT_POINTS + ", " +
-			GPX_COL_COLOR + ", " +
-			GPX_COL_FILE_LAST_MODIFIED_TIME + ", " +
-			GPX_COL_FILE_LAST_UPLOADED_TIME + ", " +
-			GPX_COL_FILE_CREATION_TIME + ", " +
-			GPX_COL_SPLIT_TYPE + ", " +
-			GPX_COL_SPLIT_INTERVAL + ", " +
-			GPX_COL_API_IMPORTED + ", " +
-			GPX_COL_WPT_CATEGORY_NAMES + ", " +
-			GPX_COL_SHOW_AS_MARKERS + ", " +
-			GPX_COL_JOIN_SEGMENTS + ", " +
-			GPX_COL_SHOW_ARROWS + ", " +
-			GPX_COL_SHOW_START_FINISH + ", " +
-			GPX_COL_WIDTH + ", " +
-			GPX_COL_GRADIENT_SPEED_COLOR + ", " +
-			GPX_COL_GRADIENT_ALTITUDE_COLOR + ", " +
-			GPX_COL_GRADIENT_SLOPE_COLOR + ", " +
-			GPX_COL_COLORING_TYPE + ", " +
-			GPX_COL_SMOOTHING_THRESHOLD + ", " +
-			GPX_COL_MIN_FILTER_SPEED + ", " +
-			GPX_COL_MAX_FILTER_SPEED + ", " +
-			GPX_COL_MIN_FILTER_ALTITUDE + ", " +
-			GPX_COL_MAX_FILTER_ALTITUDE + ", " +
-			GPX_COL_MAX_FILTER_HDOP + ", " +
-			GPX_COL_START_LAT + ", " +
-			GPX_COL_START_LON + ", " +
-			GPX_COL_NEAREST_CITY_NAME +
-			" FROM " + GPX_TABLE_NAME;
-
 	private static final String GPX_UPDATE_PARAMETERS_START = "UPDATE " + GPX_TABLE_NAME + " SET ";
-	private static final String GPX_FIND_BY_NAME_AND_DIR = " WHERE " + GPX_COL_NAME + " = ? AND " + GPX_COL_DIR + " = ?";
-
-	private static final String GPX_NEAREST_CITY_LIST = "SELECT DISTINCT " +
-			GPX_COL_NEAREST_CITY_NAME + " FROM " + GPX_TABLE_NAME +
-			" WHERE " + GPX_COL_NEAREST_CITY_NAME + " NOT NULL";
-
-	private static final String GPX_TRACK_COLORS_LIST = "SELECT DISTINCT " +
-			GPX_COL_COLOR + " FROM " + GPX_TABLE_NAME +
-			" WHERE " + GPX_COL_COLOR + " <> ''";
+	private static final String GPX_FIND_BY_NAME_AND_DIR = " WHERE " + GPX_COL_NAME.getColumnName() + " = ? AND " + GPX_COL_DIR.getColumnName() + " = ?";
 
 	private static final String GPX_MIN_CREATE_DATE = "SELECT " +
-			"MIN(" + GPX_COL_FILE_CREATION_TIME + ") " +
-			" FROM " + GPX_TABLE_NAME + " WHERE " + GPX_COL_FILE_CREATION_TIME +
+			"MIN(" + GPX_COL_FILE_CREATION_TIME.getColumnName() + ") " +
+			" FROM " + GPX_TABLE_NAME + " WHERE " + GPX_COL_FILE_CREATION_TIME.getColumnName() +
 			" > " + UNKNOWN_TIME_THRESHOLD;
 
 	private static final String GPX_MAX_TRACK_DURATION = "SELECT " +
-			"MAX(" + GPX_COL_TOTAL_DISTANCE + ") " +
+			"MAX(" + GPX_COL_TOTAL_DISTANCE.getColumnName() + ") " +
 			" FROM " + GPX_TABLE_NAME;
 
 	private static final String GPX_TRACK_FOLDERS_COLLECTION = "SELECT " +
-			GPX_COL_DIR + ", count (*) as " + TMP_NAME_COLUMN_COUNT +
+			GPX_COL_DIR.getColumnName() + ", count (*) as " + TMP_NAME_COLUMN_COUNT +
 			" FROM " + GPX_TABLE_NAME +
-			" group by " + GPX_COL_DIR +
-			" ORDER BY " + GPX_COL_DIR + " ASC";
+			" group by " + GPX_COL_DIR.getColumnName() +
+			" ORDER BY " + GPX_COL_DIR.getColumnName() + " ASC";
 
 	private static final String GPX_TRACK_NEAREST_CITIES_COLLECTION = "SELECT " +
-			GPX_COL_NEAREST_CITY_NAME + ", count (*) as " + TMP_NAME_COLUMN_COUNT +
+			GPX_COL_NEAREST_CITY_NAME.getColumnName() + ", count (*) as " + TMP_NAME_COLUMN_COUNT +
 			" FROM " + GPX_TABLE_NAME +
-			" WHERE " + GPX_COL_NEAREST_CITY_NAME + " NOT NULL" + " AND " +
-			GPX_COL_NEAREST_CITY_NAME + " <> '' " +
-			" group by " + GPX_COL_NEAREST_CITY_NAME +
+			" WHERE " + GPX_COL_NEAREST_CITY_NAME.getColumnName() + " NOT NULL" + " AND " +
+			GPX_COL_NEAREST_CITY_NAME.getColumnName() + " <> '' " +
+			" group by " + GPX_COL_NEAREST_CITY_NAME.getColumnName() +
 			" ORDER BY " + TMP_NAME_COLUMN_COUNT + " DESC";
 
 	private static final String GPX_TRACK_COLORS_COLLECTION = "SELECT DISTINCT " +
-			"case when " + GPX_COL_COLOR + " is null then '' else " + GPX_COL_COLOR + " end as " + TMP_NAME_COLUMN_NOT_NULL + ", " +
+			"case when " + GPX_COL_COLOR.getColumnName() + " is null then '' else " + GPX_COL_COLOR.getColumnName() + " end as " + TMP_NAME_COLUMN_NOT_NULL + ", " +
 			"count (*) as " + TMP_NAME_COLUMN_COUNT +
 			" FROM " + GPX_TABLE_NAME +
 			" group by " + TMP_NAME_COLUMN_NOT_NULL +
 			" ORDER BY " + TMP_NAME_COLUMN_COUNT + " DESC";
 
 	private static final String GPX_TRACK_WIDTH_COLLECTION = "SELECT DISTINCT " +
-			"case when " + GPX_COL_WIDTH + " is null then '' else " + GPX_COL_WIDTH + " end as " + TMP_NAME_COLUMN_NOT_NULL + ", " +
+			"case when " + GPX_COL_WIDTH.getColumnName() + " is null then '' else " + GPX_COL_WIDTH.getColumnName() + " end as " + TMP_NAME_COLUMN_NOT_NULL + ", " +
 			"count (*) as " + TMP_NAME_COLUMN_COUNT +
 			" FROM " + GPX_TABLE_NAME +
 			" group by " + TMP_NAME_COLUMN_NOT_NULL +
@@ -280,21 +164,55 @@ public class GPXDatabase {
 	}
 
 	private void onCreate(SQLiteConnection db) {
-		db.execSQL(GPX_TABLE_CREATE);
-		db.execSQL("CREATE INDEX IF NOT EXISTS " + GPX_INDEX_NAME_DIR + " ON " + GPX_TABLE_NAME + " (" + GPX_COL_NAME + ", " + GPX_COL_DIR + ");");
+		db.execSQL(getCreateTableQuery());
+		db.execSQL("CREATE INDEX IF NOT EXISTS " + GPX_INDEX_NAME_DIR + " ON " + GPX_TABLE_NAME + " (" + GPX_COL_NAME.getColumnName() + ", " + GPX_COL_DIR.getColumnName() + ");");
+	}
+
+	@NonNull
+	private String getCreateTableQuery() {
+		StringBuilder builder = new StringBuilder("CREATE TABLE IF NOT EXISTS " + GPX_TABLE_NAME + " (");
+		Iterator<GpxParameter> iterator = new Arrays.Iterator<>(GpxParameter.values());
+		while (iterator.hasNext()) {
+			GpxParameter parameter = iterator.next();
+			builder.append(" ").append(parameter.getColumnName()).append(" ").append(parameter.getColumnType());
+
+			if (iterator.hasNext()) {
+				builder.append(", ");
+			} else {
+				builder.append(");");
+			}
+		}
+		return builder.toString();
+	}
+
+	@NonNull
+	private String getSelectQuery() {
+		StringBuilder builder = new StringBuilder("SELECT ");
+		Iterator<GpxParameter> iterator = new Arrays.Iterator<>(GpxParameter.values());
+		while (iterator.hasNext()) {
+			GpxParameter parameter = iterator.next();
+			builder.append(parameter.getColumnName());
+
+			if (iterator.hasNext()) {
+				builder.append(", ");
+			} else {
+				builder.append(" FROM ").append(GPX_TABLE_NAME);
+			}
+		}
+		return builder.toString();
 	}
 
 	private void onUpgrade(SQLiteConnection db, int oldVersion, int newVersion) {
 		if (oldVersion < 2) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_COLOR + " TEXT");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_COLOR.getColumnName() + " TEXT");
 		}
 		if (oldVersion < 3) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_FILE_LAST_MODIFIED_TIME + " long");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_FILE_LAST_MODIFIED_TIME.getColumnName() + " long");
 		}
 
 		if (oldVersion < 4) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SPLIT_TYPE + " int");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SPLIT_INTERVAL + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SPLIT_TYPE.getColumnName() + " int");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SPLIT_INTERVAL.getColumnName() + " double");
 		}
 
 		if (oldVersion < 5) {
@@ -306,98 +224,97 @@ public class GPXDatabase {
 			if (cursor.moveToFirst()) {
 				do {
 					String columnName = cursor.getString(1);
-					if (!colorColumnExists && columnName.equals(GPX_COL_COLOR)) {
+					if (!colorColumnExists && columnName.equals(GPX_COL_COLOR.getColumnName())) {
 						colorColumnExists = true;
-					} else if (!fileLastModifiedTimeColumnExists && columnName.equals(GPX_COL_FILE_LAST_MODIFIED_TIME)) {
+					} else if (!fileLastModifiedTimeColumnExists && columnName.equals(GPX_COL_FILE_LAST_MODIFIED_TIME.getColumnName())) {
 						fileLastModifiedTimeColumnExists = true;
-					} else if (!splitTypeColumnExists && columnName.equals(GPX_COL_SPLIT_TYPE)) {
+					} else if (!splitTypeColumnExists && columnName.equals(GPX_COL_SPLIT_TYPE.getColumnName())) {
 						splitTypeColumnExists = true;
-					} else if (!splitIntervalColumnExists && columnName.equals(GPX_COL_SPLIT_INTERVAL)) {
+					} else if (!splitIntervalColumnExists && columnName.equals(GPX_COL_SPLIT_INTERVAL.getColumnName())) {
 						splitIntervalColumnExists = true;
 					}
 				} while (cursor.moveToNext());
 			}
 			cursor.close();
 			if (!colorColumnExists) {
-				db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_COLOR + " TEXT");
+				db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_COLOR.getColumnName() + " TEXT");
 			}
 			if (!fileLastModifiedTimeColumnExists) {
-				db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_FILE_LAST_MODIFIED_TIME + " long");
-				List<GpxDataItem> items = getItems();
-				for (GpxDataItem item : items) {
-					updateLastModifiedTime(item);
+				db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_FILE_LAST_MODIFIED_TIME.getColumnName() + " long");
+				for (GpxDataItem item : getItems()) {
+					updateGpxParameter(item, GPX_COL_FILE_LAST_MODIFIED_TIME, item.getFile().lastModified());
 				}
 			}
 			if (!splitTypeColumnExists) {
-				db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SPLIT_TYPE + " int");
+				db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SPLIT_TYPE.getColumnName() + " int");
 			}
 			if (!splitIntervalColumnExists) {
-				db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SPLIT_INTERVAL + " double");
+				db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SPLIT_INTERVAL.getColumnName() + " double");
 			}
 		}
 
 		if (oldVersion < 6) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_API_IMPORTED + " int");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_API_IMPORTED.getColumnName() + " int");
 			db.execSQL("UPDATE " + GPX_TABLE_NAME +
-					" SET " + GPX_COL_API_IMPORTED + " = ? " +
-					"WHERE " + GPX_COL_API_IMPORTED + " IS NULL", new Object[] {0});
+					" SET " + GPX_COL_API_IMPORTED.getColumnName() + " = ? " +
+					"WHERE " + GPX_COL_API_IMPORTED.getColumnName() + " IS NULL", new Object[] {0});
 		}
 
 		if (oldVersion < 7) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_WPT_CATEGORY_NAMES + " TEXT");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_WPT_CATEGORY_NAMES.getColumnName() + " TEXT");
 		}
 
 		if (oldVersion < 8) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SHOW_AS_MARKERS + " int");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SHOW_AS_MARKERS.getColumnName() + " int");
 			db.execSQL("UPDATE " + GPX_TABLE_NAME +
-					" SET " + GPX_COL_SHOW_AS_MARKERS + " = ? " +
-					"WHERE " + GPX_COL_SHOW_AS_MARKERS + " IS NULL", new Object[] {0});
+					" SET " + GPX_COL_SHOW_AS_MARKERS.getColumnName() + " = ? " +
+					"WHERE " + GPX_COL_SHOW_AS_MARKERS.getColumnName() + " IS NULL", new Object[] {0});
 		}
 		if (oldVersion < 10) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_JOIN_SEGMENTS + " int");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_JOIN_SEGMENTS.getColumnName() + " int");
 			db.execSQL("UPDATE " + GPX_TABLE_NAME +
-					" SET " + GPX_COL_JOIN_SEGMENTS + " = ? " +
-					"WHERE " + GPX_COL_JOIN_SEGMENTS + " IS NULL", new Object[] {0});
+					" SET " + GPX_COL_JOIN_SEGMENTS.getColumnName() + " = ? " +
+					"WHERE " + GPX_COL_JOIN_SEGMENTS.getColumnName() + " IS NULL", new Object[] {0});
 		}
 		if (oldVersion < 11) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SHOW_ARROWS + " int");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SHOW_START_FINISH + " int");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_WIDTH + " TEXT");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_GRADIENT_SPEED_COLOR + " TEXT");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_GRADIENT_ALTITUDE_COLOR + " TEXT");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_GRADIENT_SLOPE_COLOR + " TEXT");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_COLORING_TYPE + " TEXT");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SHOW_ARROWS.getColumnName() + " int");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SHOW_START_FINISH.getColumnName() + " int");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_WIDTH.getColumnName() + " TEXT");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_GRADIENT_SPEED_COLOR.getColumnName() + " TEXT");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_GRADIENT_ALTITUDE_COLOR.getColumnName() + " TEXT");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_GRADIENT_SLOPE_COLOR.getColumnName() + " TEXT");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_COLORING_TYPE.getColumnName() + " TEXT");
 
-			db.execSQL(GPX_UPDATE_PARAMETERS_START + GPX_COL_SHOW_ARROWS + " = ? " +
-					"WHERE " + GPX_COL_SHOW_ARROWS + " IS NULL", new Object[] {0});
-			db.execSQL(GPX_UPDATE_PARAMETERS_START + GPX_COL_SHOW_START_FINISH + " = ? " +
-					"WHERE " + GPX_COL_SHOW_START_FINISH + " IS NULL", new Object[] {1});
+			db.execSQL(GPX_UPDATE_PARAMETERS_START + GPX_COL_SHOW_ARROWS.getColumnName() + " = ? " +
+					"WHERE " + GPX_COL_SHOW_ARROWS.getColumnName() + " IS NULL", new Object[] {0});
+			db.execSQL(GPX_UPDATE_PARAMETERS_START + GPX_COL_SHOW_START_FINISH.getColumnName() + " = ? " +
+					"WHERE " + GPX_COL_SHOW_START_FINISH.getColumnName() + " IS NULL", new Object[] {1});
 		}
 		if (oldVersion < 12) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_FILE_LAST_UPLOADED_TIME + " long");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_FILE_LAST_UPLOADED_TIME.getColumnName() + " long");
 		}
 		if (oldVersion < 13) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SMOOTHING_THRESHOLD + " double");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MIN_FILTER_SPEED + " double");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MAX_FILTER_SPEED + " double");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MIN_FILTER_ALTITUDE + " double");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MAX_FILTER_ALTITUDE + " double");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MAX_FILTER_HDOP + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_SMOOTHING_THRESHOLD.getColumnName() + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MIN_FILTER_SPEED.getColumnName() + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MAX_FILTER_SPEED.getColumnName() + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MIN_FILTER_ALTITUDE.getColumnName() + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MAX_FILTER_ALTITUDE.getColumnName() + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_MAX_FILTER_HDOP.getColumnName() + " double");
 		}
 		if (oldVersion < 14) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_START_LAT + " double");
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_START_LON + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_START_LAT.getColumnName() + " double");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_START_LON.getColumnName() + " double");
 		}
 		if (oldVersion < 15) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_NEAREST_CITY_NAME + " TEXT");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_NEAREST_CITY_NAME.getColumnName() + " TEXT");
 		}
 		if (oldVersion < 16) {
-			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_FILE_CREATION_TIME + " long");
+			db.execSQL("ALTER TABLE " + GPX_TABLE_NAME + " ADD " + GPX_COL_FILE_CREATION_TIME.getColumnName() + " long");
 		}
-		db.execSQL("CREATE INDEX IF NOT EXISTS " + GPX_INDEX_NAME_DIR + " ON " + GPX_TABLE_NAME + " (" + GPX_COL_NAME + ", " + GPX_COL_DIR + ");");
+		db.execSQL("CREATE INDEX IF NOT EXISTS " + GPX_INDEX_NAME_DIR + " ON " + GPX_TABLE_NAME + " (" + GPX_COL_NAME.getColumnName() + ", " + GPX_COL_DIR.getColumnName() + ");");
 	}
 
-	private boolean updateGpxParameters(@NonNull Map<String, Object> rowsToUpdate, @NonNull Map<String, Object> rowsToSearch) {
+	private boolean updateGpxParameters(@NonNull Map<GpxParameter, Object> rowsToUpdate, @NonNull Map<String, Object> rowsToSearch) {
 		SQLiteConnection db = openConnection(false);
 		if (db != null) {
 			try {
@@ -409,8 +326,26 @@ public class GPXDatabase {
 		return false;
 	}
 
-	private boolean updateGpxParameters(@NonNull SQLiteConnection db, @NonNull Map<String, Object> rowsToUpdate, @NonNull Map<String, Object> rowsToSearch) {
-		Pair<String, Object[]> pair = AndroidDbUtils.createDbUpdateQuery(GPX_TABLE_NAME, rowsToUpdate, rowsToSearch);
+	public boolean updateGpxParameter(@NonNull GpxDataItem item, @NonNull GpxParameter parameter, @Nullable Object value) {
+		if (parameter.isValidValue(value)) {
+			Map<GpxParameter, Object> map = Collections.singletonMap(parameter, value);
+			boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
+			if (success) {
+				item.getGpxData().setValue(parameter, value);
+			}
+			return success;
+		} else {
+			LOG.warn("Invalid value " + value + " for parameter " + parameter);
+		}
+		return false;
+	}
+
+	private boolean updateGpxParameters(@NonNull SQLiteConnection db, @NonNull Map<GpxParameter, Object> rowsToUpdate, @NonNull Map<String, Object> rowsToSearch) {
+		Map<String, Object> map = new LinkedHashMap<>();
+		for (Map.Entry<GpxParameter, Object> entry : rowsToUpdate.entrySet()) {
+			map.put(entry.getKey().getColumnName(), entry.getValue());
+		}
+		Pair<String, Object[]> pair = AndroidDbUtils.createDbUpdateQuery(GPX_TABLE_NAME, map, rowsToSearch);
 		db.execSQL(pair.first, pair.second);
 		return true;
 	}
@@ -418,131 +353,21 @@ public class GPXDatabase {
 	@NonNull
 	private Map<String, Object> getRowsToSearch(@NonNull File file) {
 		Map<String, Object> map = new LinkedHashMap<>();
-		map.put(GPX_COL_NAME, getFileName(file));
-		map.put(GPX_COL_DIR, getFileDir(file));
+		map.put(GPX_COL_NAME.getColumnName(), getFileName(file));
+		map.put(GPX_COL_DIR.getColumnName(), getFileDir(file));
 		return map;
 	}
 
-	private void updateLastModifiedTime(@NonNull GpxDataItem item) {
-		File file = item.getFile();
-		long lastModified = file.lastModified();
-
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_FILE_LAST_MODIFIED_TIME, lastModified);
-		boolean success = updateGpxParameters(map, getRowsToSearch(file));
-		if (success) {
-			item.getGpxData().setFileLastModifiedTime(lastModified);
-		}
-	}
-
-	public boolean updateLastUploadedTime(@NonNull GpxDataItem item, long lastUploadedTime) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_FILE_LAST_UPLOADED_TIME, lastUploadedTime);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setFileLastUploadedTime(lastUploadedTime);
-		}
-		return success;
-	}
-
-	public boolean updateCreateTime(@NonNull GpxDataItem item, long creationTime) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_FILE_CREATION_TIME, creationTime);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setFileCreationTime(creationTime);
-		}
-		return success;
-	}
-
 	public boolean rename(@NonNull File currentFile, @NonNull File newFile) {
-		Map<String, Object> map = new LinkedHashMap<>();
+		Map<GpxParameter, Object> map = new LinkedHashMap<>();
 		map.put(GPX_COL_NAME, getFileName(newFile));
 		map.put(GPX_COL_DIR, getFileDir(newFile));
 
 		return updateGpxParameters(map, getRowsToSearch(currentFile));
 	}
 
-	public boolean updateColor(@NonNull GpxDataItem item, @ColorInt int color) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_COLOR, (color == 0 ? "" : Algorithms.colorToString(color)));
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setColor(color);
-		}
-		return success;
-	}
-
-	public boolean updateColoringType(@NonNull GpxDataItem item, @Nullable String coloringType) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_COLORING_TYPE, coloringType);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setColoringType(coloringType);
-		}
-		return success;
-	}
-
-	public boolean updateNearestCityName(@NonNull GpxDataItem item, @Nullable String cityName) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_NEAREST_CITY_NAME, cityName);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setNearestCityName(cityName);
-		}
-		return success;
-	}
-
-	public boolean updateShowArrows(GpxDataItem item, boolean showArrows) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_SHOW_ARROWS, showArrows ? 1 : 0);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setShowArrows(showArrows);
-		}
-		return success;
-	}
-
-	public boolean updateShowStartFinish(@NonNull GpxDataItem item, boolean showStartFinish) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_SHOW_START_FINISH, showStartFinish ? 1 : 0);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setShowStartFinish(showStartFinish);
-		}
-		return success;
-	}
-
-	public boolean updateWidth(@NonNull GpxDataItem item, @NonNull String width) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_WIDTH, width);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setWidth(width);
-		}
-		return success;
-	}
-
-	public boolean updateShowAsMarkers(@NonNull GpxDataItem item, boolean showAsMarkers) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_SHOW_AS_MARKERS, showAsMarkers ? 1 : 0);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setShowAsMarkers(showAsMarkers);
-		}
-		return success;
-	}
-
-	public boolean updateImportedByApi(@NonNull GpxDataItem item, boolean importedByApi) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_API_IMPORTED, importedByApi ? 1 : 0);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setImportedByApi(importedByApi);
-		}
-		return success;
-	}
-
-	public boolean updateJoinSegments(@NonNull GpxDataItem item, boolean joinSegments) {
-		Map<String, Object> map = Collections.singletonMap(GPX_COL_JOIN_SEGMENTS, joinSegments ? 1 : 0);
-		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
-		if (success) {
-			item.getGpxData().setJoinSegments(joinSegments);
-		}
-		return success;
-	}
-
 	public boolean updateSplit(@NonNull GpxDataItem item, int splitType, double splitInterval) {
-		Map<String, Object> map = new LinkedHashMap<>();
+		Map<GpxParameter, Object> map = new LinkedHashMap<>();
 		map.put(GPX_COL_SPLIT_TYPE, splitType);
 		map.put(GPX_COL_SPLIT_INTERVAL, splitInterval);
 
@@ -558,7 +383,7 @@ public class GPXDatabase {
 	public boolean updateGpsFiltersConfig(@NonNull GpxDataItem item, double smoothingThreshold,
 	                                      double minSpeed, double maxSpeed, double minAltitude,
 	                                      double maxAltitude, double maxHdop) {
-		Map<String, Object> map = new LinkedHashMap<>();
+		Map<GpxParameter, Object> map = new LinkedHashMap<>();
 		map.put(GPX_COL_SMOOTHING_THRESHOLD, smoothingThreshold);
 		map.put(GPX_COL_MIN_FILTER_SPEED, minSpeed);
 		map.put(GPX_COL_MAX_FILTER_SPEED, maxSpeed);
@@ -569,12 +394,12 @@ public class GPXDatabase {
 		boolean success = updateGpxParameters(map, getRowsToSearch(item.getFile()));
 		if (success) {
 			GpxData data = item.getGpxData();
-			data.setSmoothingThreshold(smoothingThreshold);
-			data.setMinFilterSpeed(minSpeed);
-			data.setMaxFilterSpeed(maxSpeed);
-			data.setMinFilterAltitude(minAltitude);
-			data.setMaxFilterAltitude(maxAltitude);
-			data.setMaxFilterHdop(maxHdop);
+			data.setValue(GPX_COL_SMOOTHING_THRESHOLD, smoothingThreshold);
+			data.setValue(GPX_COL_MIN_FILTER_SPEED, minSpeed);
+			data.setValue(GPX_COL_MAX_FILTER_SPEED, maxSpeed);
+			data.setValue(GPX_COL_MIN_FILTER_ALTITUDE, minAltitude);
+			data.setValue(GPX_COL_MAX_FILTER_ALTITUDE, maxAltitude);
+			data.setValue(GPX_COL_MAX_FILTER_HDOP, maxHdop);
 		}
 		return success;
 	}
@@ -582,9 +407,9 @@ public class GPXDatabase {
 	public boolean updateAppearance(@NonNull GpxDataItem item, int color, @NonNull String width,
 	                                boolean showArrows, boolean showStartFinish, int splitType,
 	                                double splitInterval, @Nullable String coloringType) {
-		Map<String, Object> map = new LinkedHashMap<>();
+		Map<GpxParameter, Object> map = new LinkedHashMap<>();
 
-		map.put(GPX_COL_COLOR, (color == 0 ? "" : Algorithms.colorToString(color)));
+		map.put(GPX_COL_COLOR, color == 0 ? "" : Algorithms.colorToString(color));
 		map.put(GPX_COL_WIDTH, width);
 		map.put(GPX_COL_SHOW_ARROWS, showArrows ? 1 : 0);
 		map.put(GPX_COL_SHOW_START_FINISH, showStartFinish ? 1 : 0);
@@ -659,51 +484,50 @@ public class GPXDatabase {
 		String color = data.getColor() == 0 ? "" : Algorithms.colorToString(data.getColor());
 
 		Map<String, Object> rowsMap = new LinkedHashMap<>();
-		rowsMap.put(GPX_COL_NAME, fileName);
-		rowsMap.put(GPX_COL_DIR, fileDir);
-		rowsMap.put(GPX_COL_COLOR, color);
-		rowsMap.put(GPX_COL_FILE_LAST_MODIFIED_TIME, file.lastModified());
-		rowsMap.put(GPX_COL_FILE_LAST_UPLOADED_TIME, data.getFileLastUploadedTime());
-		rowsMap.put(GPX_COL_FILE_CREATION_TIME, data.getFileCreationTime());
-		rowsMap.put(GPX_COL_SPLIT_TYPE, data.getSplitType());
-		rowsMap.put(GPX_COL_SPLIT_INTERVAL, data.getSplitInterval());
-		rowsMap.put(GPX_COL_API_IMPORTED, data.isImportedByApi() ? 1 : 0);
-		rowsMap.put(GPX_COL_SHOW_AS_MARKERS, data.isShowAsMarkers() ? 1 : 0);
-		rowsMap.put(GPX_COL_JOIN_SEGMENTS, data.isJoinSegments() ? 1 : 0);
-		rowsMap.put(GPX_COL_SHOW_ARROWS, data.isShowArrows() ? 1 : 0);
-		rowsMap.put(GPX_COL_SHOW_START_FINISH, data.isShowStartFinish() ? 1 : 0);
-		rowsMap.put(GPX_COL_WIDTH, data.getWidth());
-		rowsMap.put(GPX_COL_COLORING_TYPE, data.getColoringType());
-		rowsMap.put(GPX_COL_SMOOTHING_THRESHOLD, data.getSmoothingThreshold());
-		rowsMap.put(GPX_COL_MIN_FILTER_SPEED, data.getMinFilterSpeed());
-		rowsMap.put(GPX_COL_MAX_FILTER_SPEED, data.getMaxFilterSpeed());
-		rowsMap.put(GPX_COL_MIN_FILTER_ALTITUDE, data.getMinFilterAltitude());
-		rowsMap.put(GPX_COL_MAX_FILTER_ALTITUDE, data.getMaxFilterAltitude());
-		rowsMap.put(GPX_COL_MAX_FILTER_HDOP, data.getMaxFilterHdop());
-		rowsMap.put(GPX_COL_NEAREST_CITY_NAME, data.getNearestCityName());
+		rowsMap.put(GPX_COL_NAME.getColumnName(), fileName);
+		rowsMap.put(GPX_COL_DIR.getColumnName(), fileDir);
+		rowsMap.put(GPX_COL_COLOR.getColumnName(), color);
+		rowsMap.put(GPX_COL_FILE_LAST_MODIFIED_TIME.getColumnName(), file.lastModified());
+		rowsMap.put(GPX_COL_FILE_LAST_UPLOADED_TIME.getColumnName(), data.getFileLastUploadedTime());
+		rowsMap.put(GPX_COL_FILE_CREATION_TIME.getColumnName(), data.getFileCreationTime());
+		rowsMap.put(GPX_COL_SPLIT_TYPE.getColumnName(), data.getSplitType());
+		rowsMap.put(GPX_COL_SPLIT_INTERVAL.getColumnName(), data.getSplitInterval());
+		rowsMap.put(GPX_COL_API_IMPORTED.getColumnName(), data.isImportedByApi() ? 1 : 0);
+		rowsMap.put(GPX_COL_SHOW_AS_MARKERS.getColumnName(), data.isShowAsMarkers() ? 1 : 0);
+		rowsMap.put(GPX_COL_JOIN_SEGMENTS.getColumnName(), data.isJoinSegments() ? 1 : 0);
+		rowsMap.put(GPX_COL_SHOW_ARROWS.getColumnName(), data.isShowArrows() ? 1 : 0);
+		rowsMap.put(GPX_COL_SHOW_START_FINISH.getColumnName(), data.isShowStartFinish() ? 1 : 0);
+		rowsMap.put(GPX_COL_WIDTH.getColumnName(), data.getWidth());
+		rowsMap.put(GPX_COL_COLORING_TYPE.getColumnName(), data.getColoringType());
+		rowsMap.put(GPX_COL_SMOOTHING_THRESHOLD.getColumnName(), data.getSmoothingThreshold());
+		rowsMap.put(GPX_COL_MIN_FILTER_SPEED.getColumnName(), data.getMinFilterSpeed());
+		rowsMap.put(GPX_COL_MAX_FILTER_SPEED.getColumnName(), data.getMaxFilterSpeed());
+		rowsMap.put(GPX_COL_MIN_FILTER_ALTITUDE.getColumnName(), data.getMinFilterAltitude());
+		rowsMap.put(GPX_COL_MAX_FILTER_ALTITUDE.getColumnName(), data.getMaxFilterAltitude());
+		rowsMap.put(GPX_COL_MAX_FILTER_HDOP.getColumnName(), data.getMaxFilterHdop());
+		rowsMap.put(GPX_COL_NEAREST_CITY_NAME.getColumnName(), data.getNearestCityName());
 
 		if (analysis != null) {
-			rowsMap.put(GPX_COL_TOTAL_DISTANCE, analysis.totalDistance);
-			rowsMap.put(GPX_COL_TOTAL_TRACKS, analysis.totalTracks);
-			rowsMap.put(GPX_COL_START_TIME, analysis.startTime);
-			rowsMap.put(GPX_COL_END_TIME, analysis.endTime);
-			rowsMap.put(GPX_COL_TIME_SPAN, analysis.timeSpan);
-			rowsMap.put(GPX_COL_TIME_MOVING, analysis.timeMoving);
-			rowsMap.put(GPX_COL_TOTAL_DISTANCE_MOVING, analysis.totalDistanceMoving);
-			rowsMap.put(GPX_COL_DIFF_ELEVATION_UP, analysis.diffElevationUp);
-			rowsMap.put(GPX_COL_DIFF_ELEVATION_DOWN, analysis.diffElevationDown);
-			rowsMap.put(GPX_COL_AVG_ELEVATION, analysis.avgElevation);
-			rowsMap.put(GPX_COL_MIN_ELEVATION, analysis.minElevation);
-			rowsMap.put(GPX_COL_MAX_ELEVATION, analysis.maxElevation);
-			rowsMap.put(GPX_COL_MAX_SPEED, analysis.maxSpeed);
-			rowsMap.put(GPX_COL_AVG_SPEED, analysis.avgSpeed);
-			rowsMap.put(GPX_COL_POINTS, analysis.points);
-			rowsMap.put(GPX_COL_WPT_POINTS, analysis.wptPoints);
-			rowsMap.put(GPX_COL_WPT_CATEGORY_NAMES, Algorithms.encodeCollection(analysis.wptCategoryNames));
-			rowsMap.put(GPX_COL_START_LAT, analysis.latLonStart != null ? analysis.latLonStart.getLatitude() : null);
-			rowsMap.put(GPX_COL_START_LON, analysis.latLonStart != null ? analysis.latLonStart.getLongitude() : null);
+			rowsMap.put(GPX_COL_TOTAL_DISTANCE.getColumnName(), analysis.totalDistance);
+			rowsMap.put(GPX_COL_TOTAL_TRACKS.getColumnName(), analysis.totalTracks);
+			rowsMap.put(GPX_COL_START_TIME.getColumnName(), analysis.startTime);
+			rowsMap.put(GPX_COL_END_TIME.getColumnName(), analysis.endTime);
+			rowsMap.put(GPX_COL_TIME_SPAN.getColumnName(), analysis.timeSpan);
+			rowsMap.put(GPX_COL_TIME_MOVING.getColumnName(), analysis.timeMoving);
+			rowsMap.put(GPX_COL_TOTAL_DISTANCE_MOVING.getColumnName(), analysis.totalDistanceMoving);
+			rowsMap.put(GPX_COL_DIFF_ELEVATION_UP.getColumnName(), analysis.diffElevationUp);
+			rowsMap.put(GPX_COL_DIFF_ELEVATION_DOWN.getColumnName(), analysis.diffElevationDown);
+			rowsMap.put(GPX_COL_AVG_ELEVATION.getColumnName(), analysis.avgElevation);
+			rowsMap.put(GPX_COL_MIN_ELEVATION.getColumnName(), analysis.minElevation);
+			rowsMap.put(GPX_COL_MAX_ELEVATION.getColumnName(), analysis.maxElevation);
+			rowsMap.put(GPX_COL_MAX_SPEED.getColumnName(), analysis.maxSpeed);
+			rowsMap.put(GPX_COL_AVG_SPEED.getColumnName(), analysis.avgSpeed);
+			rowsMap.put(GPX_COL_POINTS.getColumnName(), analysis.points);
+			rowsMap.put(GPX_COL_WPT_POINTS.getColumnName(), analysis.wptPoints);
+			rowsMap.put(GPX_COL_WPT_CATEGORY_NAMES.getColumnName(), Algorithms.encodeCollection(analysis.wptCategoryNames));
+			rowsMap.put(GPX_COL_START_LAT.getColumnName(), analysis.latLonStart != null ? analysis.latLonStart.getLatitude() : null);
+			rowsMap.put(GPX_COL_START_LON.getColumnName(), analysis.latLonStart != null ? analysis.latLonStart.getLongitude() : null);
 		}
-
 		db.execSQL(AndroidDbUtils.createDbInsertQuery(GPX_TABLE_NAME, rowsMap.keySet()), rowsMap.values().toArray());
 	}
 
@@ -723,7 +547,7 @@ public class GPXDatabase {
 		boolean hasAnalysis = analysis != null;
 		long fileLastModifiedTime = hasAnalysis ? item.getFile().lastModified() : 0;
 
-		Map<String, Object> map = new LinkedHashMap<>();
+		Map<GpxParameter, Object> map = new LinkedHashMap<>();
 		map.put(GPX_COL_TOTAL_DISTANCE, hasAnalysis ? analysis.totalDistance : null);
 		map.put(GPX_COL_TOTAL_TRACKS, hasAnalysis ? analysis.totalTracks : null);
 		map.put(GPX_COL_START_TIME, hasAnalysis ? analysis.startTime : null);
@@ -857,12 +681,12 @@ public class GPXDatabase {
 			data.setColoringType(coloringType == null ? null : coloringType.getName(null));
 		}
 
-		data.setSmoothingThreshold(smoothingThreshold);
-		data.setMinFilterSpeed(minFilterSpeed);
-		data.setMaxFilterSpeed(maxFilterSpeed);
-		data.setMinFilterAltitude(minFilterAltitude);
-		data.setMaxFilterAltitude(maxFilterAltitude);
-		data.setMaxFilterHdop(maxFilterHdop);
+		data.setValue(GPX_COL_SMOOTHING_THRESHOLD, smoothingThreshold);
+		data.setValue (GPX_COL_MIN_FILTER_SPEED, minFilterSpeed);
+		data.setValue (GPX_COL_MAX_FILTER_SPEED, maxFilterSpeed);
+		data.setValue (GPX_COL_MIN_FILTER_ALTITUDE, minFilterAltitude);
+		data.setValue (GPX_COL_MAX_FILTER_ALTITUDE, maxFilterAltitude);
+		data.setValue (GPX_COL_MAX_FILTER_HDOP, maxFilterHdop);
 
 		return item;
 	}
@@ -957,7 +781,7 @@ public class GPXDatabase {
 		SQLiteConnection db = openConnection(false);
 		if (db != null) {
 			try {
-				SQLiteCursor query = db.rawQuery(GPX_TABLE_SELECT, null);
+				SQLiteCursor query = db.rawQuery(getSelectQuery(), null);
 				if (query != null) {
 					try {
 						if (query.moveToFirst()) {
@@ -995,8 +819,7 @@ public class GPXDatabase {
 		GpxDataItem result = null;
 		String fileName = getFileName(file);
 		String fileDir = getFileDir(file);
-		SQLiteCursor query = db.rawQuery(GPX_TABLE_SELECT + " WHERE " + GPX_COL_NAME + " = ? AND " +
-				GPX_COL_DIR + " = ?", new String[] {fileName, fileDir});
+		SQLiteCursor query = db.rawQuery(getSelectQuery() + GPX_FIND_BY_NAME_AND_DIR, new String[] {fileName, fileDir});
 		if (query != null) {
 			try {
 				if (query.moveToFirst()) {
@@ -1015,7 +838,7 @@ public class GPXDatabase {
 		SQLiteConnection db = openConnection(false);
 		if (db != null) {
 			try {
-				SQLiteCursor query = db.rawQuery(GPX_TABLE_SELECT + " WHERE " + GPX_COL_SPLIT_TYPE + " != ?", new String[] {String.valueOf(0)});
+				SQLiteCursor query = db.rawQuery(getSelectQuery() + " WHERE " + GPX_COL_SPLIT_TYPE.getColumnName() + " != ?", new String[] {String.valueOf(0)});
 				if (query != null) {
 					try {
 						if (query.moveToFirst()) {

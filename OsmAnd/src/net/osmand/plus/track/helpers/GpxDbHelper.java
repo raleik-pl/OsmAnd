@@ -1,6 +1,16 @@
 package net.osmand.plus.track.helpers;
 
 import static net.osmand.IndexConstants.GPX_INDEX_DIR;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_API_IMPORTED;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_COLOR;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_COLORING_TYPE;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_FILE_LAST_UPLOADED_TIME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_JOIN_SEGMENTS;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_NEAREST_CITY_NAME;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SHOW_ARROWS;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SHOW_AS_MARKERS;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_SHOW_START_FINISH;
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_WIDTH;
 
 import android.os.AsyncTask;
 import android.util.Pair;
@@ -92,55 +102,55 @@ public class GpxDbHelper implements GpxDbReaderCallback {
 	}
 
 	public boolean updateColor(@NonNull GpxDataItem item, @ColorInt int color) {
-		boolean res = database.updateColor(item, color);
+		boolean res = database.updateGpxParameter(item, GPX_COL_COLOR, color == 0 ? "" : Algorithms.colorToString(color));
 		putToCache(item);
 		return res;
 	}
 
 	public boolean updateLastUploadedTime(@NonNull GpxDataItem item, long fileLastUploadedTime) {
-		boolean res = database.updateLastUploadedTime(item, fileLastUploadedTime);
+		boolean res = database.updateGpxParameter(item, GPX_COL_FILE_LAST_UPLOADED_TIME, fileLastUploadedTime);
 		putToCache(item);
 		return res;
 	}
 
 	public boolean updateColoringType(@NonNull GpxDataItem item, @Nullable String coloringType) {
-		boolean res = database.updateColoringType(item, coloringType);
+		boolean res = database.updateGpxParameter(item, GPX_COL_COLORING_TYPE, coloringType);
 		putToCache(item);
 		return res;
 	}
 
 	public boolean updateNearestCityName(@NonNull GpxDataItem item, @Nullable String nearestCityName) {
-		boolean res = database.updateNearestCityName(item, nearestCityName);
+		boolean res = database.updateGpxParameter(item, GPX_COL_NEAREST_CITY_NAME, nearestCityName);
 		putToCache(item);
 		return res;
 	}
 
 	public boolean updateShowAsMarkers(@NonNull GpxDataItem item, boolean showAsMarkers) {
-		boolean res = database.updateShowAsMarkers(item, showAsMarkers);
+		boolean res = database.updateGpxParameter(item, GPX_COL_SHOW_AS_MARKERS, showAsMarkers ? 1 : 0);
 		putToCache(item);
 		return res;
 	}
 
 	public boolean updateImportedByApi(@NonNull GpxDataItem item, boolean importedByApi) {
-		boolean res = database.updateImportedByApi(item, importedByApi);
+		boolean res = database.updateGpxParameter(item, GPX_COL_API_IMPORTED, importedByApi ? 1 : 0);
 		putToCache(item);
 		return res;
 	}
 
 	public boolean updateShowArrows(@NonNull GpxDataItem item, boolean showArrows) {
-		boolean res = database.updateShowArrows(item, showArrows);
+		boolean res = database.updateGpxParameter(item, GPX_COL_SHOW_ARROWS, showArrows ? 1 : 0);
 		putToCache(item);
 		return res;
 	}
 
 	public boolean updateShowStartFinish(@NonNull GpxDataItem item, boolean showStartFinish) {
-		boolean res = database.updateShowStartFinish(item, showStartFinish);
+		boolean res = database.updateGpxParameter(item, GPX_COL_SHOW_START_FINISH, showStartFinish ? 1 : 0);
 		putToCache(item);
 		return res;
 	}
 
 	public boolean updateWidth(@NonNull GpxDataItem item, @NonNull String width) {
-		boolean res = database.updateWidth(item, width);
+		boolean res = database.updateGpxParameter(item, GPX_COL_WIDTH, width);
 		putToCache(item);
 		return res;
 	}
@@ -152,7 +162,7 @@ public class GpxDbHelper implements GpxDbReaderCallback {
 	}
 
 	public boolean updateJoinSegments(@NonNull GpxDataItem item, boolean joinSegments) {
-		boolean res = database.updateJoinSegments(item, joinSegments);
+		boolean res = database.updateGpxParameter(item, GPX_COL_JOIN_SEGMENTS, joinSegments ? 1 : 0);
 		putToCache(item);
 		return res;
 	}

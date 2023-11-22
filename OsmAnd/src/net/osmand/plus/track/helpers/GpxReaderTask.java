@@ -1,5 +1,7 @@
 package net.osmand.plus.track.helpers;
 
+import static net.osmand.plus.track.helpers.GpxParameter.GPX_COL_FILE_CREATION_TIME;
+
 import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
@@ -88,7 +90,7 @@ class GpxReaderTask extends AsyncTask<Void, GpxDataItem, Void> {
 							database.updateAnalysis(conn, item, analysis);
 						}
 						if (item.getGpxData().getFileCreationTime() <= 0) {
-							database.updateCreateTime(item, GPXUtilities.getCreationTime(gpxFile));
+							database.updateGpxParameter(item, GPX_COL_FILE_CREATION_TIME, GPXUtilities.getCreationTime(gpxFile));
 						}
 					}
 					if (GpxDbHelper.isCitySearchNeeded(item)) {
