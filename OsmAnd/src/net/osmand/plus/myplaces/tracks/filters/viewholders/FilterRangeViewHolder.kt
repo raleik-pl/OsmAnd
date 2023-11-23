@@ -9,6 +9,8 @@ import com.google.android.material.slider.RangeSlider.OnSliderTouchListener
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.helpers.AndroidUiHelper
+import net.osmand.plus.myplaces.tracks.filters.BaseTrackFilter
+import net.osmand.plus.myplaces.tracks.filters.MeasureUnitType
 import net.osmand.plus.myplaces.tracks.filters.RangeTrackFilter
 import net.osmand.plus.utils.UiUtilities
 import net.osmand.plus.widgets.OsmandTextFieldBoxes
@@ -38,7 +40,7 @@ open class FilterRangeViewHolder(
 	private val minMaxContainer: View
 	private val explicitIndicator: ImageView
 	private val slider: RangeSlider
-	private lateinit var filter: RangeTrackFilter
+	private lateinit var filter: BaseTrackFilter
 	private lateinit var valueFromInput: ExtendedEditText
 	private lateinit var valueToInput: ExtendedEditText
 	private val valueFromInputContainer: OsmandTextFieldBoxes
@@ -108,7 +110,7 @@ open class FilterRangeViewHolder(
 				if (!Algorithms.isEmpty(newText) && Algorithms.isInt(newText.toString())) {
 					val newValue = newText.toString().toInt()
 					if (filter.getDisplayValueFrom() != newValue
-						&& newValue < filter.valueTo
+						&& newValue < filter.getValueTo()
 						&& !isSliderDragging) {
 						filter.setValueFrom(newValue.toFloat())
 						updateValues()
@@ -135,13 +137,13 @@ open class FilterRangeViewHolder(
 		valueToInputContainer = itemView.findViewById(R.id.value_to)
 	}
 
-	fun bindView(filter: RangeTrackFilter) {
+	fun bindView(filter: BaseTrackFilter) {
 		this.filter = filter
 		title.setText(filter.displayNameId)
 		valueFromInputContainer.labelText =
-			"${app.getString(R.string.shared_string_from)}, ${app.getString(filter.unitResId)}"
+			"${app.getString(R.string.shared_string_from)}, ${app.getString(getFilterUnit())}"
 		valueToInputContainer.labelText =
-			"${app.getString(R.string.shared_string_to)}, ${app.getString(filter.unitResId)}"
+			"${app.getString(R.string.shared_string_to)}, ${app.getString(getFilterUnit())}"
 		updateExpandState()
 		updateValues()
 	}
@@ -168,9 +170,9 @@ open class FilterRangeViewHolder(
 		valueToInput.setText(valueTo.toString())
 		valueToInput.setSelection(valueToInput.length())
 		val minValuePrompt =
-			"${decimalFormat.format(minValue)} ${app.getString(filter.unitResId)}"
+			"${decimalFormat.format(minValue)} ${app.getString(getFilterUnit())}"
 		val maxValuePrompt =
-			"${decimalFormat.format(maxValue)} ${app.getString(filter.unitResId)}"
+			"${decimalFormat.format(maxValue)} ${app.getString(getFilterUnit())}"
 		minFilterValue.text = minValuePrompt
 		maxFilterValue.text = maxValuePrompt
 		AndroidUiHelper.updateVisibility(selectedValue, filter.isEnabled())
@@ -184,6 +186,14 @@ open class FilterRangeViewHolder(
 			app.getString(R.string.track_filter_range_selected_format),
 			fromTxt,
 			toTxt,
-			app.getString(filter.unitResId))
+			app.getString(getFilterUnit()))
+	}
+
+
+	fun getFilterUnit(): Int{
+		return when(filter.measureUnitType){
+			MeasureUnitType.TIME_DURATION -> R.string.shared_string_minute_lowercase
+			else -> 0
+		}
 	}
 }

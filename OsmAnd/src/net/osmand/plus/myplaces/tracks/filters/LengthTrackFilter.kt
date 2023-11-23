@@ -3,7 +3,7 @@ package net.osmand.plus.myplaces.tracks.filters
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.LENGTH
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 import net.osmand.plus.settings.enums.MetricsConstants
 import net.osmand.plus.utils.OsmAndFormatter
 import kotlin.math.ceil
@@ -15,7 +15,7 @@ class LengthTrackFilter(
 	app: OsmandApplication, filterChangedListener: FilterChangedListener?) : RangeTrackFilter(
 	minValue,
 	maxValue,
-	app, R.string.routing_attr_length_name, LENGTH, filterChangedListener) {
+	app, R.string.routing_attr_length_name, TEXT, filterChangedListener) {
 
 	private var coef = 1f
 
@@ -41,9 +41,10 @@ class LengthTrackFilter(
 			return false
 		}
 		var normalizedValue = length
-		return normalizedValue > valueFrom && normalizedValue < valueTo
-				|| normalizedValue < minValue && valueFrom == minValue
-				|| normalizedValue > maxValue && valueTo == maxValue
+		return true
+//		normalizedValue > valueFrom && normalizedValue < valueTo
+//				|| normalizedValue < minValue && valueFrom == minValue
+//				|| normalizedValue > maxValue && valueTo == maxValue
 	}
 
 	override fun initFilter() {
@@ -72,18 +73,18 @@ class LengthTrackFilter(
 	}
 
 	override fun getDisplayMaxValue(): Int {
-		return ceil(if (coef != 0f) maxValue / coef.toInt() else ceil(maxValue)).toInt()
+		return ceil(if (coef != 0f) getMaxValue() / coef.toInt() else ceil(getMaxValue())).toInt()
 	}
 
 	override fun getDisplayMinValue(): Int {
-		return floor(if (coef != 0f) minValue / coef else minValue).toInt()
+		return floor(if (coef != 0f) getMinValue() / coef else getMinValue()).toInt()
 	}
 
 	override fun getDisplayValueFrom(): Int {
-		return floor(if (coef != 0f) valueFrom / coef else valueFrom).toInt()
+		return floor(if (coef != 0f) getValueFrom() / coef else getValueFrom()).toInt()
 	}
 
 	override fun getDisplayValueTo(): Int {
-		return ceil(if (coef != 0f) valueTo / coef else valueTo).toInt()
+		return ceil(if (coef != 0f) getValueTo() / coef else getValueTo()).toInt()
 	}
 }

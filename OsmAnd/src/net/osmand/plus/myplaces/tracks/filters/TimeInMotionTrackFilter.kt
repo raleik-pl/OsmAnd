@@ -3,7 +3,7 @@ package net.osmand.plus.myplaces.tracks.filters
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.TIME_IN_MOTION
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 
 class TimeInMotionTrackFilter(
 	minValue: Float,
@@ -12,7 +12,7 @@ class TimeInMotionTrackFilter(
 	filterChangedListener: FilterChangedListener?) : RangeTrackFilter(
 	minValue,
 	maxValue,
-	app, R.string.moving_time, TIME_IN_MOTION, filterChangedListener) {
+	app, R.string.moving_time, TEXT, filterChangedListener) {
 
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
 		val duration = trackItem.dataItem?.gpxData?.analysis?.timeMoving
@@ -20,8 +20,9 @@ class TimeInMotionTrackFilter(
 			return false
 		}
 		val durationMinutes = duration.toDouble() / 1000 / 60
-		return durationMinutes > valueFrom && durationMinutes < valueTo
-				|| durationMinutes < minValue && valueFrom == minValue
-				|| durationMinutes > maxValue && valueTo == maxValue
+		return true
+//		durationMinutes > valueFrom && durationMinutes < valueTo
+//				|| durationMinutes < minValue && valueFrom == minValue
+//				|| durationMinutes > maxValue && valueTo == maxValue
 	}
 }

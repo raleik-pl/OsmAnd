@@ -3,7 +3,7 @@ package net.osmand.plus.myplaces.tracks.filters
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.AVERAGE_ALTITUDE
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 
 class AverageAltitudeTrackFilter(
 	minValue: Float,
@@ -12,7 +12,7 @@ class AverageAltitudeTrackFilter(
 	filterChangedListener: FilterChangedListener?) : RangeTrackFilter(
 	minValue,
 	maxValue,
-	app, R.string.average_altitude, AVERAGE_ALTITUDE, filterChangedListener) {
+	app, R.string.average_altitude, TEXT, filterChangedListener) {
 	override val unitResId = R.string.m
 
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
@@ -20,8 +20,8 @@ class AverageAltitudeTrackFilter(
 		if (elevation == null || (elevation == 0.0)) {
 			return false
 		}
-		return elevation > valueFrom && elevation < valueTo
-				|| elevation < minValue && valueFrom == minValue
-				|| elevation > maxValue && valueTo == maxValue
+		return elevation > getValueFrom() && elevation < getValueTo()
+				|| elevation < getMinValue() && getValueFrom() == getMinValue()
+				|| elevation > getMaxValue() && getValueTo() == getMaxValue()
 	}
 }

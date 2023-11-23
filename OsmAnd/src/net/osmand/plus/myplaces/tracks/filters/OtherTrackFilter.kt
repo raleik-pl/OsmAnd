@@ -4,10 +4,10 @@ import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.OTHER
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 
 class OtherTrackFilter(val app: OsmandApplication, filterChangedListener: FilterChangedListener?) :
-	BaseTrackFilter(R.string.shared_string_other, OTHER, filterChangedListener) {
+	BaseTrackFilter(R.string.shared_string_other, TEXT, filterChangedListener) {
 
 	override fun isEnabled(): Boolean {
 		return isVisibleOnMap || hasWaypoints

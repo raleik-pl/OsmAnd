@@ -3,7 +3,7 @@ package net.osmand.plus.myplaces.tracks.filters
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.UPHILL
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 
 class UphillTrackFilter(
 	minValue: Float,
@@ -11,7 +11,7 @@ class UphillTrackFilter(
 	app: OsmandApplication, filterChangedListener: FilterChangedListener?) : RangeTrackFilter(
 	minValue,
 	maxValue,
-	app, R.string.shared_string_uphill, UPHILL, filterChangedListener) {
+	app, R.string.shared_string_uphill, TEXT, filterChangedListener) {
 	override val unitResId = R.string.m
 
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
@@ -19,8 +19,9 @@ class UphillTrackFilter(
 		return if (elevation == null)
 			false
 		else
-			elevation > valueFrom && elevation < valueTo
-					|| elevation < minValue && valueFrom == minValue
-					|| elevation > maxValue && valueTo == maxValue
+			true
+//			elevation > valueFrom && elevation < valueTo
+//					|| elevation < minValue && valueFrom == minValue
+//					|| elevation > maxValue && valueTo == maxValue
 	}
 }

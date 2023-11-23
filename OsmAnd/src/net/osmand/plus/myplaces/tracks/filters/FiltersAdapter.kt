@@ -35,68 +35,32 @@ class FiltersAdapter(
 		val inflater = UiUtilities.getInflater(parent.context, nightMode)
 
 		return when (FilterType.values()[viewType]) {
-			FilterType.NAME -> {
+			FilterType.TEXT -> {
 				val view = inflater.inflate(R.layout.filter_name_item, parent, false)
 				FilterNameViewHolder(view, nightMode)
 			}
 
-			FilterType.LENGTH,
-			FilterType.TIME_IN_MOTION,
-			FilterType.AVERAGE_SPEED,
-			FilterType.MAX_SPEED,
-			FilterType.UPHILL,
-			FilterType.DOWNHILL,
-			FilterType.MAX_ALTITUDE,
-			FilterType.AVERAGE_ALTITUDE -> {
+			FilterType.RANGE -> {
 				val view = inflater.inflate(R.layout.filter_range_item, parent, false)
 				FilterRangeViewHolder(view, nightMode)
 			}
 
-			FilterType.DURATION -> {
-				val view = inflater.inflate(R.layout.filter_range_item, parent, false)
-				FilterDurationViewHolder(view, nightMode)
-			}
-
-			FilterType.DATE_CREATION -> {
+			FilterType.DATE_RANGE -> {
 				val view = inflater.inflate(R.layout.filter_date_item, parent, false)
 				FilterDateViewHolder(view, nightMode)
 			}
 
-			FilterType.CITY -> {
-				val view = inflater.inflate(R.layout.filter_city_item, parent, false)
+			FilterType.SINGLE_FIELD_LIST -> {
+				val view = inflater.inflate(R.layout.filter_single_field_list_item, parent, false)
 				FilterCityViewHolder(
 					app,
 					view,
 					nightMode)
 			}
 
-			FilterType.FOLDER -> {
-				val view = inflater.inflate(R.layout.filter_folder_item, parent, false)
-				FilterFolderViewHolder(
-					app,
-					view,
-					nightMode)
-			}
-
-			FilterType.OTHER -> {
+			FilterType.MULTI_FIELD_LIST -> {
 				val view = inflater.inflate(R.layout.filter_other_item, parent, false)
 				FilterOtherViewHolder(view, nightMode)
-			}
-
-			FilterType.COLOR -> {
-				val view = inflater.inflate(R.layout.filter_city_item, parent, false)
-				FilterColorViewHolder(
-					app,
-					view,
-					nightMode)
-			}
-
-			FilterType.WIDTH -> {
-				val view = inflater.inflate(R.layout.filter_city_item, parent, false)
-				FilterWidthViewHolder(
-					app,
-					view,
-					nightMode)
 			}
 		}
 	}
@@ -109,32 +73,33 @@ class FiltersAdapter(
 	override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 		val item = items[position]
 		if (holder is FilterNameViewHolder) {
-			holder.bindView((item as TrackNameFilter).value,
+			holder.bindView(item.getValue() as String,
 				object : TextChangedListener {
 					override fun onTextChanged(newText: String) {
-						item.value = newText
+						item.setValue(newText)
 					}
 				})
 		} else if (holder is FilterDurationViewHolder) {
 			holder.bindView(item as DurationTrackFilter)
 		} else if (holder is FilterRangeViewHolder) {
-			if (item.filterType == FilterType.TIME_IN_MOTION) {
-				holder.bindView(item as TimeInMotionTrackFilter)
-			} else if (item.filterType == FilterType.LENGTH) {
-				holder.bindView(item as LengthTrackFilter)
-			} else if (item.filterType == FilterType.AVERAGE_SPEED) {
-				holder.bindView(item as AverageSpeedTrackFilter)
-			} else if (item.filterType == FilterType.MAX_SPEED) {
-				holder.bindView(item as MaxSpeedTrackFilter)
-			} else if (item.filterType == FilterType.AVERAGE_ALTITUDE) {
-				holder.bindView(item as AverageAltitudeTrackFilter)
-			} else if (item.filterType == FilterType.MAX_ALTITUDE) {
-				holder.bindView(item as MaxAltitudeTrackFilter)
-			} else if (item.filterType == FilterType.UPHILL) {
-				holder.bindView(item as UphillTrackFilter)
-			} else if (item.filterType == FilterType.DOWNHILL) {
-				holder.bindView(item as DownhillTrackFilter)
-			}
+			holder.bindView(item)
+//			if (item.filterType == FilterType.TIME_IN_MOTION) {
+//				holder.bindView(item as TimeInMotionTrackFilter)
+//			} else if (item.filterType == FilterType.LENGTH) {
+//				holder.bindView(item as LengthTrackFilter)
+//			} else if (item.filterType == FilterType.AVERAGE_SPEED) {
+//				holder.bindView(item as AverageSpeedTrackFilter)
+//			} else if (item.filterType == FilterType.MAX_SPEED) {
+//				holder.bindView(item as MaxSpeedTrackFilter)
+//			} else if (item.filterType == FilterType.AVERAGE_ALTITUDE) {
+//				holder.bindView(item as AverageAltitudeTrackFilter)
+//			} else if (item.filterType == FilterType.MAX_ALTITUDE) {
+//				holder.bindView(item as MaxAltitudeTrackFilter)
+//			} else if (item.filterType == FilterType.UPHILL) {
+//				holder.bindView(item as UphillTrackFilter)
+//			} else if (item.filterType == FilterType.DOWNHILL) {
+//				holder.bindView(item as DownhillTrackFilter)
+//			}
 		} else if (holder is FilterDateViewHolder) {
 			holder.bindView(item as DateCreationTrackFilter, activity)
 		} else if (holder is FilterCityViewHolder) {

@@ -4,11 +4,11 @@ import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.CITY
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 import net.osmand.util.Algorithms
 
 class CityTrackFilter(app: OsmandApplication, filterChangedListener: FilterChangedListener?) :
-	ListTrackFilter(app, R.string.nearest_cities, CITY, filterChangedListener) {
+	ListTrackFilter(app, R.string.nearest_cities, TEXT, filterChangedListener) {
 
 	override fun isEnabled(): Boolean {
 		return !Algorithms.isEmpty(selectedItems)
@@ -36,7 +36,7 @@ class CityTrackFilter(app: OsmandApplication, filterChangedListener: FilterChang
 	override fun initWithValue(value: BaseTrackFilter) {
 		if(value is CityTrackFilter) {
 			if(!Algorithms.isEmpty(value.selectedCities) || Algorithms.isEmpty(value.selectedItems)){
-				value.selectedItems = ArrayList(value.selectedCities)
+				value.setSelectedItems(ArrayList(value.selectedCities))
 			}
 		}
 		super.initWithValue(value)

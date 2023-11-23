@@ -22,6 +22,7 @@ import net.osmand.plus.R
 import net.osmand.plus.base.BaseOsmAndDialogFragment
 import net.osmand.plus.myplaces.tracks.DialogClosedListener
 import net.osmand.plus.myplaces.tracks.TrackFiltersHelper
+import net.osmand.plus.myplaces.tracks.filters.BaseTrackFilter
 import net.osmand.plus.myplaces.tracks.filters.ListFilterAdapter
 import net.osmand.plus.myplaces.tracks.filters.ListTrackFilter
 import net.osmand.plus.myplaces.tracks.filters.SmartFolderUpdateListener
@@ -37,24 +38,23 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 		fun showInstance(
 			app: OsmandApplication,
 			manager: FragmentManager,
-			filter: ListTrackFilter,
+			filter: BaseTrackFilter,
 			dialogClosedListener: DialogClosedListener?,
 			selectedItemsListener: NewSelectedItemsListener) {
 			if (AndroidUtils.isFragmentCanBeAdded(manager, TAG)) {
-				val initialFilter = TrackFiltersHelper.createFilter(app, filter.filterType, null)
-				if (initialFilter !is ListTrackFilter) {
-					throw IllegalArgumentException("Filter should be subclass from ListTrackFilter")
-				}
-				initialFilter.initWithValue(filter)
+//				val initialFilter = TrackFiltersHelper.createFilter(app, filter.filterType, null)
+//				if (initialFilter !is ListTrackFilter) {
+//					throw IllegalArgumentException("Filter should be subclass from ListTrackFilter")
+//				}
+//				initialFilter.initWithValue(filter)
+				val initialFilter = filter.clone()
 				val nightMode = app.daynightHelper.isNightMode(true)
-				val currentFilter =
-					TrackFiltersHelper.createFilter(app, filter.filterType, null) as ListTrackFilter
-				currentFilter.initWithValue(filter)
+				val currentFilter = filter.clone()
 				currentFilter.setFullItemsCollection(filter.allItemsCollection)
 				val adapter = ListFilterAdapter(app, nightMode, null, null)
 				adapter.filter = currentFilter
 				adapter.showAllItems = true
-				adapter.items = ArrayList(filter.allItems)
+				adapter.items = ArrayList(filter.allItemsCollection.keys)
 				val fragment = FilterAllVariantsListFragment()
 				fragment.initialFilter = initialFilter
 				fragment.retainInstance = true
@@ -67,14 +67,14 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 		}
 	}
 
-	lateinit var initialFilter: ListTrackFilter
+	lateinit var initialFilter: BaseTrackFilter
 	lateinit var adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
 
 	var progressBar: ProgressBar? = null
 	private var showButton: DialogButton? = null
 	private var dialogClosedListener: DialogClosedListener? = null
 	private lateinit var appBar: AppBarLayout
-	private lateinit var currentChangesFilter: ListTrackFilter
+	private lateinit var currentChangesFilter: BaseTrackFilter
 	private lateinit var selectedItemsListener: NewSelectedItemsListener
 	private val textWatcher: TextWatcher = object : TextWatcher {
 		override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}

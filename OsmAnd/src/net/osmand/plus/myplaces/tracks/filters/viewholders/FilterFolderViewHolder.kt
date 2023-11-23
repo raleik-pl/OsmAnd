@@ -45,7 +45,7 @@ class FilterFolderViewHolder(var app: OsmandApplication, itemView: View, nightMo
 			expanded = !expanded
 			updateExpandState()
 		}
-		recycler = itemView.findViewById(R.id.folders)
+		recycler = itemView.findViewById(R.id.variants)
 	}
 
 	fun bindView(filter: TrackFolderFilter, fragmentManager: FragmentManager) {

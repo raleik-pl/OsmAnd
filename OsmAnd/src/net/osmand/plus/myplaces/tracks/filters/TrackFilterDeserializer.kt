@@ -19,7 +19,7 @@ class TrackFilterDeserializer(private val smartFolderHelper: SmartFolderHelper) 
 		context: JsonDeserializationContext): BaseTrackFilter? {
 		var baseFilterObject = json.asJsonObject
 		var filterType = gson.fromJson(baseFilterObject.get("filterType"), FilterType::class.java)
-		var realFilterObjectType = TrackFiltersHelper.getFilterClass(filterType)
+		var realFilterObjectType = BaseTrackFilter::class.java//TrackFiltersHelper.getFilterClass(filterType)
 		return gson.fromJson(baseFilterObject, realFilterObjectType)
 	}
 }

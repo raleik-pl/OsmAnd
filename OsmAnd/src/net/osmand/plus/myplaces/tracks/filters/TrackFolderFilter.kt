@@ -5,12 +5,12 @@ import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.FOLDER
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 import net.osmand.plus.track.data.TrackFolder
 import net.osmand.util.Algorithms
 
 class TrackFolderFilter(app: OsmandApplication, filterChangedListener: FilterChangedListener?) :
-	ListTrackFilter(app, R.string.folder, FOLDER, filterChangedListener) {
+	ListTrackFilter(app, R.string.folder, TEXT, filterChangedListener) {
 
 	@Expose
 	private var selectedFolders = HashSet<String>()
@@ -19,7 +19,7 @@ class TrackFolderFilter(app: OsmandApplication, filterChangedListener: FilterCha
 		set(value) {
 			field = value
 			value?.let {
-				selectedItems = arrayListOf(it.getDirName())
+				setSelectedItems(arrayListOf(it.getDirName()))
 			}
 		}
 
@@ -94,7 +94,7 @@ class TrackFolderFilter(app: OsmandApplication, filterChangedListener: FilterCha
 	override fun initWithValue(value: BaseTrackFilter) {
 		if (value is TrackFolderFilter) {
 			if (!Algorithms.isEmpty(value.selectedFolders) || Algorithms.isEmpty(value.selectedItems)) {
-				value.selectedItems = ArrayList(value.selectedFolders)
+				value.setSelectedItems(ArrayList(value.selectedFolders))
 			}
 		}
 		super.initWithValue(value)

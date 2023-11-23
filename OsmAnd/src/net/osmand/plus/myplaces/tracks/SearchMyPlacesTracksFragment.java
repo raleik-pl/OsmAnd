@@ -8,7 +8,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -120,7 +119,7 @@ public class SearchMyPlacesTracksFragment extends SearchTrackBaseFragment implem
 				filtersChanged = true;
 			} else {
 				for (BaseTrackFilter folderFilter : smartFolder.getFilters()) {
-					BaseTrackFilter currentFilter = searchFilter.getFilterByType(folderFilter.getFilterType());
+					BaseTrackFilter currentFilter = searchFilter.getFilterById(folderFilter.getDisplayNameId());
 					if (currentFilter == null || !currentFilter.equals(folderFilter)) {
 						filtersChanged = true;
 						break;

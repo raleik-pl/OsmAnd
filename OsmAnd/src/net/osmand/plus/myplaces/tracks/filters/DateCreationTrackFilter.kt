@@ -3,13 +3,12 @@ package net.osmand.plus.myplaces.tracks.filters
 import com.google.gson.annotations.Expose
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.DATE_CREATION
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class DateCreationTrackFilter(filterChangedListener: FilterChangedListener?) :
-	BaseTrackFilter(R.string.date_of_creation, DATE_CREATION, filterChangedListener) {
+	BaseTrackFilter(R.string.date_of_creation, FilterType.TEXT, filterChangedListener) {
 	var initialValueFrom = Date().time
 	var initialValueTo = Date().time
 

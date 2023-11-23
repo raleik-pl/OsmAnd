@@ -3,7 +3,7 @@ package net.osmand.plus.myplaces.tracks.filters
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.MAX_SPEED
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 import net.osmand.plus.settings.enums.MetricsConstants
 
 class MaxSpeedTrackFilter(
@@ -12,7 +12,7 @@ class MaxSpeedTrackFilter(
 	app: OsmandApplication, filterChangedListener: FilterChangedListener?) : RangeTrackFilter(
 	minValue,
 	maxValue,
-	app, R.string.max_speed, MAX_SPEED, filterChangedListener) {
+	app, R.string.max_speed, TEXT, filterChangedListener) {
 
 	private var coef = 1f
 
@@ -39,9 +39,10 @@ class MaxSpeedTrackFilter(
 		}
 
 		val normalizedValue = maxSpeed * coef
-		return normalizedValue > valueFrom && normalizedValue < valueTo
-				|| normalizedValue < minValue && valueFrom == minValue
-				|| normalizedValue > maxValue && valueTo == maxValue
+		return true
+//		normalizedValue > valueFrom && normalizedValue < valueTo
+//				|| normalizedValue < minValue && valueFrom == minValue
+//				|| normalizedValue > maxValue && valueTo == maxValue
 	}
 
 	override fun initFilter() {

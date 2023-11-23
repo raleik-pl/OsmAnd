@@ -3,7 +3,7 @@ package net.osmand.plus.myplaces.tracks.filters
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.AVERAGE_SPEED
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 import net.osmand.plus.settings.enums.MetricsConstants
 
 class AverageSpeedTrackFilter(
@@ -13,7 +13,7 @@ class AverageSpeedTrackFilter(
 	filterChangedListener: FilterChangedListener?) : RangeTrackFilter(
 	minValue,
 	maxValue,
-	app, R.string.average_speed, AVERAGE_SPEED, filterChangedListener) {
+	app, R.string.average_speed, TEXT, filterChangedListener) {
 
 	private var coef = 1f
 
@@ -39,9 +39,10 @@ class AverageSpeedTrackFilter(
 			return false
 		}
 		val normalizedValue = avgSpeed * coef
-		return normalizedValue > valueFrom && normalizedValue < valueTo
-				|| normalizedValue < minValue && valueFrom == minValue
-				|| normalizedValue > maxValue && valueTo == maxValue
+		return true
+//		normalizedValue > valueFrom && normalizedValue < valueTo
+//				|| normalizedValue < minValue && valueFrom == minValue
+//				|| normalizedValue > maxValue && valueTo == maxValue
 	}
 
 	override fun initFilter() {

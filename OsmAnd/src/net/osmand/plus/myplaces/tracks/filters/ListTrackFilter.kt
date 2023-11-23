@@ -16,24 +16,24 @@ abstract class ListTrackFilter(
 		return !Algorithms.isEmpty(selectedItems)
 	}
 
-	@Expose
-	var selectedItems = ArrayList<String>()
-		protected set
+	//	@Expose
+//	var selectedItems = ArrayList<String>()
+//		protected set
 	var allItems: MutableList<String> = arrayListOf()
 		private set
-	var allItemsCollection: HashMap<String, Int> = hashMapOf()
+//	var allItemsCollection: HashMap<String, Int> = hashMapOf()
 
-	fun setFullItemsCollection(collection: HashMap<String, Int>) {
-		allItems = ArrayList(collection.keys)
-		allItemsCollection = collection
-	}
+//	fun setFullItemsCollection(collection: HashMap<String, Int>) {
+//		allItems = ArrayList(collection.keys)
+//		allItemsCollection = collection
+//	}
 
-	@Expose
-	var isSelectAllItemsSelected = false
-		set(value) {
-			field = value
-			filterChangedListener?.onFilterChanged()
-		}
+//	@Expose
+//	var isSelectAllItemsSelected = false
+//		set(value) {
+//			field = value
+//			filterChangedListener?.onFilterChanged()
+//		}
 
 	fun setFullItemsCollection(collection: List<Pair<String, Int>>) {
 		val tmpAllItems = ArrayList<String>()
@@ -46,31 +46,32 @@ abstract class ListTrackFilter(
 		allItemsCollection = tmpAllItemsCollection
 	}
 
-	fun setSelectedItems(selectedItems: List<String>) {
-		this.selectedItems = ArrayList(selectedItems)
-		filterChangedListener?.onFilterChanged()
-	}
-
-	fun setItemSelected(item: String, selected: Boolean) {
-		if (selected) {
-			selectedItems.add(item)
-		} else {
-			selectedItems.remove(item)
-		}
-		filterChangedListener?.onFilterChanged()
-	}
-
-	fun isItemSelected(item: String): Boolean {
-		return selectedItems.contains(item)
-	}
+//	fun setSelectedItems(selectedItems: List<String>) {
+//		this.selectedItems = ArrayList(selectedItems)
+//		filterChangedListener?.onFilterChanged()
+//	}
+//
+//	fun setItemSelected(item: String, selected: Boolean) {
+//		if (selected) {
+//			selectedItems.add(item)
+//		} else {
+//			selectedItems.remove(item)
+//		}
+//		filterChangedListener?.onFilterChanged()
+//	}
+//
+//	fun isItemSelected(item: String): Boolean {
+//		return selectedItems.contains(item)
+//	}
 
 	override fun initWithValue(value: BaseTrackFilter) {
 		if (value is ListTrackFilter) {
-			selectedItems = if (value.selectedItems == null) {
-				ArrayList()
-			} else {
-				ArrayList(value.selectedItems)
-			}
+			setSelectedItems(
+				if (value.selectedItems == null) {
+					ArrayList()
+				} else {
+					ArrayList(value.selectedItems)
+				})
 			for (item in value.selectedItems) {
 				if (!allItems.contains(item)) {
 					allItems.add(item)
@@ -79,10 +80,6 @@ abstract class ListTrackFilter(
 			}
 			filterChangedListener?.onFilterChanged()
 		}
-	}
-
-	fun getSelectedItems(): List<String> {
-		return ArrayList(selectedItems)
 	}
 
 	fun areAllItemsSelected(items: List<String>): Boolean {
@@ -106,19 +103,11 @@ abstract class ListTrackFilter(
 		return null
 	}
 
-	fun getTracksCountForItem(itemName: String): Int {
-		return allItemsCollection[itemName] ?: 0
-	}
-
+//	fun getTracksCountForItem(itemName: String): Int {
+//		return allItemsCollection[itemName] ?: 0
+//	}
+//
 	open fun hasSelectAllVariant(): Boolean {
 		return false
-	}
-
-	fun addSelectedItems(selectedItems: List<String>) {
-		this.selectedItems.addAll(selectedItems)
-	}
-
-	fun clearSelectedItems() {
-		selectedItems = ArrayList()
 	}
 }

@@ -7,13 +7,13 @@ import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.COLOR
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 import net.osmand.plus.utils.ColorUtilities
 import net.osmand.plus.utils.UiUtilities
 import net.osmand.util.Algorithms
 
 class ColorTrackFilter(app: OsmandApplication, filterChangedListener: FilterChangedListener?) :
-	ListTrackFilter(app, R.string.shared_string_color, COLOR, filterChangedListener) {
+	ListTrackFilter(app, R.string.shared_string_color, TEXT, filterChangedListener) {
 
 	override fun isEnabled(): Boolean {
 		return !Algorithms.isEmpty(selectedItems)
@@ -68,7 +68,7 @@ class ColorTrackFilter(app: OsmandApplication, filterChangedListener: FilterChan
 	override fun initWithValue(value: BaseTrackFilter) {
 		if(value is ColorTrackFilter) {
 			if(!Algorithms.isEmpty(value.selectedColors) || Algorithms.isEmpty(value.selectedItems)){
-				value.selectedItems = ArrayList(value.selectedColors)
+				value.setSelectedItems(ArrayList(value.selectedColors));
 			}
 		}
 		super.initWithValue(value)

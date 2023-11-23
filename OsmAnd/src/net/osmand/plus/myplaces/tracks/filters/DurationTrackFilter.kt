@@ -3,7 +3,7 @@ package net.osmand.plus.myplaces.tracks.filters
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.DURATION
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 
 class DurationTrackFilter(
 	minValue: Float,
@@ -11,7 +11,7 @@ class DurationTrackFilter(
 	app: OsmandApplication, filterChangedListener: FilterChangedListener?) : RangeTrackFilter(
 	minValue,
 	maxValue,
-	app, R.string.duration, DURATION, filterChangedListener) {
+	app, R.string.duration, TEXT, filterChangedListener) {
 	override val unitResId = R.string.shared_string_minute_lowercase
 
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
@@ -20,8 +20,9 @@ class DurationTrackFilter(
 			return false
 		}
 		val durationMinutes = duration.toDouble() / 1000 / 60
-		return durationMinutes > valueFrom && durationMinutes < valueTo
-				|| durationMinutes < minValue && valueFrom == minValue
-				|| durationMinutes > maxValue && valueTo == maxValue
+		return true
+//		durationMinutes > valueFrom && durationMinutes < valueTo
+//				|| durationMinutes < minValue && valueFrom == minValue
+//				|| durationMinutes > maxValue && valueTo == maxValue
 	}
 }

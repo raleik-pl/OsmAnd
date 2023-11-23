@@ -5,13 +5,13 @@ import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.myplaces.tracks.filters.FilterType.WIDTH
+import net.osmand.plus.myplaces.tracks.filters.FilterType.TEXT
 import net.osmand.plus.routing.cards.RouteLineWidthCard
 import net.osmand.plus.track.fragments.TrackAppearanceFragment
 import net.osmand.util.Algorithms
 
 class WidthTrackFilter(app: OsmandApplication, filterChangedListener: FilterChangedListener?) :
-	ListTrackFilter(app, R.string.shared_string_width, WIDTH, filterChangedListener) {
+	ListTrackFilter(app, R.string.shared_string_width, TEXT, filterChangedListener) {
 
 	override fun isEnabled(): Boolean {
 		return !Algorithms.isEmpty(selectedItems)
@@ -77,7 +77,7 @@ class WidthTrackFilter(app: OsmandApplication, filterChangedListener: FilterChan
 	override fun initWithValue(value: BaseTrackFilter) {
 		if (value is WidthTrackFilter) {
 			if (!Algorithms.isEmpty(value.selectedWidths) || Algorithms.isEmpty(value.selectedItems)) {
-				value.selectedItems = ArrayList(value.selectedWidths)
+				value.setSelectedItems(ArrayList(value.selectedWidths))
 			}
 		}
 		super.initWithValue(value)
