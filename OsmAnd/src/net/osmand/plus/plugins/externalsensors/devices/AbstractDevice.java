@@ -167,6 +167,15 @@ public abstract class AbstractDevice<T extends AbstractSensor> {
 		return Collections.emptyList();
 	}
 
+	@Nullable
+	public String getChangeableProperty(DeviceChangeableProperty property){
+		if(property == NAME) {
+			return getName();
+		}
+		return null;
+	}
+
+
 	public void setChangeableProperty(DeviceChangeableProperty property, String value) {
 		if (property == NAME) {
 			setDeviceName(value);

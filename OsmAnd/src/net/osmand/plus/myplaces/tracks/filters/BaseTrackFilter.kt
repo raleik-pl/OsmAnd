@@ -19,9 +19,11 @@ open class BaseTrackFilter(
 	@SerializedName("filterType") val filterType: FilterType,
 	@Expose val measureUnitType: MeasureUnitType,
 	var filterChangedListener: FilterChangedListener?,
-	val trackParams: List<GpxParameter>,
+	val trackParam: GpxParameter,
 	var defaultParams: List<Any>) {
 
+
+	@Deprecated("delete while refactoring")
 	constructor(
 		displayNameId: Int,
 		filterType: FilterType,
@@ -30,7 +32,7 @@ open class BaseTrackFilter(
 		filterType,
 		MeasureUnitType.NONE,
 		filterChangedListener,
-		Collections.emptyList(),
+		GpxParameter.GPX_COL_NAME,
 		Collections.emptyList()
 	)
 
@@ -137,6 +139,25 @@ open class BaseTrackFilter(
 				nameMatcher.matches(trackItem.name)
 
 			}
+			FilterType.RANGE -> {
+				val trackValue = trackItem.dataItem?.gpxData?.getValue(trackParam) as Float
+
+				trackValue?.let { trackValue ->
+					trackValue > getValueFrom() && trackValue < getValueTo()
+				|| trackValue < getMinValue() && getValueFrom() == getMinValue()
+				|| trackValue > getMaxValue() && getValueTo() == getMaxValue()
+				}
+
+				val duration = trackItem.dataItem?.gpxData?.analysis?.timeSpan
+						if (duration == null || (duration == 0L)) {
+							return false
+						}
+				val durationMinutes = duration.toDouble() / 1000 / 60
+				return true
+//		durationMinutes > valueFrom && durationMinutes < valueTo
+//				|| durationMinutes < minValue && valueFrom == minValue
+//				|| durationMinutes > maxValue && valueTo == maxValue
+			}
 
 			else -> true
 		}
@@ -164,7 +185,7 @@ open class BaseTrackFilter(
 			filterType,
 			measureUnitType,
 			null,
-			ArrayList(trackParams),
+			trackParam,
 			ArrayList(defaultParams))
 		newFilter.params = ArrayList(params)
 		return newFilter

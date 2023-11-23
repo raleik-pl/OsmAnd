@@ -12,6 +12,7 @@ import net.osmand.plus.helpers.AndroidUiHelper
 import net.osmand.plus.myplaces.tracks.filters.BaseTrackFilter
 import net.osmand.plus.myplaces.tracks.filters.MeasureUnitType
 import net.osmand.plus.myplaces.tracks.filters.RangeTrackFilter
+import net.osmand.plus.settings.enums.MetricsConstants
 import net.osmand.plus.utils.UiUtilities
 import net.osmand.plus.widgets.OsmandTextFieldBoxes
 import net.osmand.plus.widgets.TextViewEx
@@ -193,7 +194,26 @@ open class FilterRangeViewHolder(
 	fun getFilterUnit(): Int{
 		return when(filter.measureUnitType){
 			MeasureUnitType.TIME_DURATION -> R.string.shared_string_minute_lowercase
+			MeasureUnitType.DISTANCE -> getDistanceUnits()
+			MeasureUnitType.ALTITUDE -> R.string.m//todo
+			MeasureUnitType.SPEED -> R.string.m//todo
+			MeasureUnitType.DATE -> R.string.m//todo
 			else -> 0
+		}
+	}
+
+	private fun getDistanceUnits(): Int {
+		val settings = app.settings
+		val mc = settings.METRIC_SYSTEM.get()
+		return when (mc!!) {
+			MetricsConstants.MILES_AND_METERS,
+			MetricsConstants.MILES_AND_FEET,
+			MetricsConstants.MILES_AND_YARDS -> R.string.mile
+
+			MetricsConstants.NAUTICAL_MILES_AND_FEET,
+			MetricsConstants.NAUTICAL_MILES_AND_METERS -> R.string.nm
+
+			MetricsConstants.KILOMETERS_AND_METERS -> R.string.km
 		}
 	}
 }

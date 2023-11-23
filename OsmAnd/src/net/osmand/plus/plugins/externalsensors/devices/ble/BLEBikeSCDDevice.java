@@ -48,6 +48,8 @@ public class BLEBikeSCDDevice extends BLEAbstractDevice {
 		bikeSensor.setWheelSize(wheelCircumference);
 	}
 
+
+
 	@Override
 	public void setChangeableProperty(DeviceChangeableProperty property, String value) {
 		if (property == DeviceChangeableProperty.WHEEL_CIRCUMFERENCE) {

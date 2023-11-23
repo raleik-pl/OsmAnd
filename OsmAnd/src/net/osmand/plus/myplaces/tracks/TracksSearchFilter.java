@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -221,6 +222,7 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 				0f,
 				TrackFiltersConstants.DEFAULT_MAX_VALUE));
 		currentFilters = newFiltersFilters;
+
 		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
 				R.string.moving_time,
 				MeasureUnitType.TIME_DURATION,
@@ -229,6 +231,97 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 				TrackFiltersConstants.DEFAULT_MAX_VALUE,
 				0f,
 				TrackFiltersConstants.DEFAULT_MAX_VALUE));
+		currentFilters = newFiltersFilters;
+
+		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+				R.string.routing_attr_length_name,
+				MeasureUnitType.DISTANCE,
+				GpxParameter.GPX_COL_TOTAL_DISTANCE,
+				0f,
+				TrackFiltersConstants.LENGTH_MAX_VALUE,
+				0f,
+				TrackFiltersConstants.LENGTH_MAX_VALUE));
+
+		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+				R.string.routing_attr_length_name,
+				MeasureUnitType.DISTANCE,
+				GpxParameter.GPX_COL_TOTAL_DISTANCE,
+				0f,
+				TrackFiltersConstants.LENGTH_MAX_VALUE,
+				0f,
+				TrackFiltersConstants.LENGTH_MAX_VALUE));
+
+		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+				R.string.average_speed,
+				MeasureUnitType.SPEED,
+				GpxParameter.GPX_COL_AVG_SPEED,
+				0f,
+				TrackFiltersConstants.DEFAULT_MAX_VALUE,
+				0f,
+				TrackFiltersConstants.DEFAULT_MAX_VALUE));
+
+		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+				R.string.max_speed,
+				MeasureUnitType.SPEED,
+				GpxParameter.GPX_COL_MAX_SPEED,
+				0f,
+				TrackFiltersConstants.DEFAULT_MAX_VALUE,
+				0f,
+				TrackFiltersConstants.DEFAULT_MAX_VALUE));
+
+		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+				R.string.shared_string_uphill,
+				MeasureUnitType.ALTITUDE,
+				GpxParameter.GPX_COL_DIFF_ELEVATION_UP,
+				0f,
+				TrackFiltersConstants.ALTITUDE_MAX_VALUE,
+				0f,
+				TrackFiltersConstants.ALTITUDE_MAX_VALUE));
+
+		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+				R.string.shared_string_downhill,
+				MeasureUnitType.ALTITUDE,
+				GpxParameter.GPX_COL_DIFF_ELEVATION_DOWN,
+				0f,
+				TrackFiltersConstants.ALTITUDE_MAX_VALUE,
+				0f,
+				TrackFiltersConstants.ALTITUDE_MAX_VALUE));
+
+		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+				R.string.average_altitude,
+				MeasureUnitType.ALTITUDE,
+				GpxParameter.GPX_COL_AVG_ELEVATION,
+				0f,
+				TrackFiltersConstants.ALTITUDE_MAX_VALUE,
+				0f,
+				TrackFiltersConstants.ALTITUDE_MAX_VALUE));
+
+		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+				R.string.max_altitude,
+				MeasureUnitType.ALTITUDE,
+				GpxParameter.GPX_COL_MAX_ELEVATION,
+				0f,
+				TrackFiltersConstants.ALTITUDE_MAX_VALUE,
+				0f,
+				TrackFiltersConstants.ALTITUDE_MAX_VALUE));
+
+
+					long minDate = (new Date()).getTime();//app.getGpxDbHelper().getTracksMinCreateDate();
+			long now = (new Date()).getTime();
+
+//		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
+//				R.string.date_of_creation,
+//				MeasureUnitType.DATE,
+//				GpxParameter.GPX_COL_FILE_CREATION_TIME,
+//				minDate,
+//				now,
+//				minDate,
+//				now));
+//
+
+
+
+
 		currentFilters = newFiltersFilters;
 
 

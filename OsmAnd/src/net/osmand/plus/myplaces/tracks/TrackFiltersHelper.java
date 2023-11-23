@@ -38,7 +38,7 @@ public class TrackFiltersHelper {
 				FilterType.TEXT,
 				MeasureUnitType.NONE,
 				listener,
-				Collections.singletonList(GpxParameter.GPX_COL_NAME),
+				GpxParameter.GPX_COL_NAME,
 				Collections.singletonList(""));
 	}
 
@@ -50,11 +50,12 @@ public class TrackFiltersHelper {
 	                                                float maxValue,
 	                                                float valueFrom,
 	                                                float valueTo) {
+
 		return new BaseTrackFilter(id,
 				FilterType.RANGE,
 				measureUnitType,
 				listener,
-				Collections.singletonList(gpxParameter),
+				gpxParameter,
 				Arrays.asList(minValue,
 						maxValue,
 						valueFrom,
