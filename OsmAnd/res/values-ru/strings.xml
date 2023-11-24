@@ -215,7 +215,6 @@
     <string name="search_hint">Город, адрес, POI</string>
     <string name="new_filter_desc">Введите имя для нового фильтра. Он добавится в список «Категории».</string>
     <string name="translit_names">Транслитерация названий</string>
-    <string name="edit_filter">Редактировать категории</string>
     <string name="subcategories">Подкатегории</string>
     <string name="selected_categories">Выбранные категории</string>
     <string name="create_custom_poi">Создать настраиваемый фильтр</string>
@@ -5471,7 +5470,7 @@
     <string name="smart_folder_saved">Смарт-папка сохранена</string>
     <string name="add_smart_folder">Создать смарт-папку</string>
     <string name="empty_name">Отсутствует имя</string>
-    <string name="edit_fiilter">Фильтр</string>
+    <string name="edit_filter">Фильтр</string>
     <string name="save_as_smart_folder">Сохранить как смарт-папку</string>
     <string name="delete_smart_folder_dialog_message">Это приведёт к удалению смарт-папки \"%1$s\".</string>
     <string name="empty_smart_folder_title">Нет подходящего трека</string>
@@ -5513,4 +5512,5 @@
     <string name="key_event_action_toggle_drower">Показать/скрыть боковое меню</string>
     <string name="shared_string_rows">Ряды</string>
     <string name="key_is_already_assigned_error">Кнопка «%1$s» уже назначена на другое действии: «%2$s»</string>
+    <string name="topography_maps">Карты ландшафта</string>
 </resources>
