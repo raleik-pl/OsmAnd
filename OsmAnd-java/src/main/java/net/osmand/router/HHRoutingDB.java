@@ -1,6 +1,7 @@
 package net.osmand.router;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -30,7 +30,8 @@ public class HHRoutingDB {
 
 	protected static final int XY_SHORTCUT_GEOM = 0;
 
-	protected Connection conn;
+	protected final Connection conn;
+	protected final File file;
 	protected PreparedStatement loadGeometry;
 	protected PreparedStatement loadSegmentEnd;
 	protected PreparedStatement loadSegmentStart;
@@ -38,9 +39,9 @@ public class HHRoutingDB {
 	protected final int BATCH_SIZE = 10000;
 	protected int batchInsPoint = 0;
 
+	protected String routingProfile = "";
 	protected TIntObjectHashMap<String> routingProfiles = new TIntObjectHashMap<String>();
 	protected boolean compactDB;
-	protected int routingProfile;
 	
 	protected static Comparator<NetworkDBPoint> indexComparator = new Comparator<NetworkDBPoint>() {
 
@@ -50,26 +51,16 @@ public class HHRoutingDB {
 		}
 	};
 	
-	public HHRoutingDB(Connection conn) throws SQLException {
+	public HHRoutingDB(File f, Connection conn) throws SQLException {
 		this.conn = conn;
+		this.file = f;
 		Statement st = conn.createStatement();
 		compactDB = checkColumnExist(st, "ins", "segments");
-		st.execute("CREATE TABLE IF NOT EXISTS profiles(id, params)");
+		st.execute("CREATE TABLE IF NOT EXISTS profiles(profile, id, params)");
 		if (!compactDB) {
 			st.execute("CREATE TABLE IF NOT EXISTS points(idPoint, pointGeoUniDir, pointGeoId, clusterId, fileDbId, dualIdPoint, dualClusterId, chInd, roadId, start, end, sx31, sy31, ex31, ey31, PRIMARY KEY(idPoint))");
 			st.execute("CREATE UNIQUE INDEX IF NOT EXISTS pointsUnique on points(pointGeoId)");
 			st.execute("CREATE TABLE IF NOT EXISTS segments(idPoint, idConnPoint, dist, shortcut, profile)");
-			if (!checkColumnExist(st, "profile", "segments")) {
-				st.execute("DROP INDEX segmentsUnique");
-				st.execute("DROP INDEX segmentsConnPntInd");
-				st.execute("DROP INDEX segmentsPntInd");
-				st.execute("DROP INDEX geometryMainInd");
-				st.execute("INSERT INTO profiles(id, params) VALUES(0, '')");
-				st.execute("ALTER TABLE geometry ADD COLUMN profile");
-				st.execute("ALTER TABLE segments ADD COLUMN profile");
-				st.execute("UPDATE segments SET profile = 0 where profile is null");
-				st.execute("UPDATE geometry SET profile = 0 where profile is null");
-			}
 			st.execute("CREATE UNIQUE INDEX IF NOT EXISTS segmentsUnique on segments(idPoint, idConnPoint, profile)");
 			st.execute("CREATE INDEX IF NOT EXISTS segmentsPntInd on segments(idPoint, profile)");
 			st.execute("CREATE INDEX IF NOT EXISTS segmentsConnPntInd on segments(idConnPoint, profile)");
@@ -82,34 +73,29 @@ public class HHRoutingDB {
 			loadSegmentEnd = conn.prepareStatement("SELECT idPoint, idConnPoint, dist, shortcut from segments where idPoint = ? AND profile = ?");
 			loadSegmentStart = conn.prepareStatement("SELECT idPoint, idConnPoint, dist, shortcut from segments where idConnPoint = ? AND profile = ?");
 		} else {
-			if (!checkColumnExist(st, "profile", "segments")) {
-				st.execute("ALTER TABLE segments ADD COLUMN profile");
-				st.execute("INSERT INTO profiles(id, params) VALUES(0, '')");
-				st.execute("UPDATE segments SET profile = 0 where profile is null");
-				// we can't remove primary key so only one profile is possible for old file
-			}
 			loadSegmentStart = conn.prepareStatement("SELECT id, ins, outs from segments where id = ? and profile = ? ");
 		}
-		ResultSet rs = st.executeQuery("SELECT id, params from profiles");
+		ResultSet rs = st.executeQuery("SELECT profile, id, params from profiles");
 		while (rs.next()) {
-			routingProfiles.put(rs.getInt(1), rs.getString(2));
+			routingProfile = rs.getString(1);
+			routingProfiles.put(rs.getInt(2), rs.getString(3));
 		}
 		st.close();
 	}
 	
-	public void selectRoutingProfile(int routingProfile) {
-		this.routingProfile = routingProfile;
+	public String getRoutingProfile() {
+		return routingProfile;
 	}
 	
-	public int getRoutingProfile() {
-		return routingProfile;
+	public File getFile() {
+		return file;
 	}
 	
 	public TIntObjectHashMap<String> getRoutingProfiles() {
 		return routingProfiles;
 	}
 	
-	public int insertRoutingProfile(String profileParams) throws SQLException {
+	public int insertRoutingProfile(String routingProfile, String profileParams) throws SQLException {
 		TIntObjectIterator<String> it = routingProfiles.iterator();
 		while(it.hasNext()) {
 			it.advance();
@@ -121,14 +107,18 @@ public class HHRoutingDB {
 		Statement s = conn.createStatement();
 		int id = routingProfiles.size();
 		routingProfiles.put(id, profileParams);
-		s.execute("INSERT INTO profiles(id, params) VALUES("+id+", '"+profileParams+"')");
+		s.execute(String.format("INSERT INTO profiles(profile, id, params) VALUES('%s', %d, '%s')",
+				routingProfile, id, profileParams));
 		return id;
 	}
 	
-	private List<NetworkDBSegment> parseSegments(byte[] bytes, TLongObjectHashMap<? extends NetworkDBPoint> pntsById,
+	public static List<NetworkDBSegment> parseSegments(byte[] bytes, TLongObjectHashMap<? extends NetworkDBPoint> pntsById,
 			List<? extends NetworkDBPoint> lst, NetworkDBPoint pnt, boolean out)  {
 		try {
 			List<NetworkDBSegment> l = new ArrayList<>();
+			if (bytes == null) {
+				return l;
+			}
 			ByteArrayInputStream str = new ByteArrayInputStream(bytes);
 			for (int i = 0; i < lst.size(); i++) {
 				int d = CodedInputStream.readRawVarint32(str);
@@ -161,7 +151,7 @@ public class HHRoutingDB {
 	
 	public <T extends NetworkDBPoint> TLongObjectHashMap<T> loadNetworkPoints(Class<T> cl) throws SQLException {
 		Statement st = conn.createStatement();
-		ResultSet rs = st.executeQuery("SELECT dualIdPoint, pointGeoId, idPoint, clusterId, chInd, roadId, start, end, sx31, sy31, ex31, ey31 from points");
+		ResultSet rs = st.executeQuery("SELECT dualIdPoint, idPoint, clusterId, chInd, roadId, start, end, sx31, sy31, ex31, ey31 from points");
 		TLongObjectHashMap<T> mp = new TLongObjectHashMap<>();
 		while (rs.next()) {
 			T pnt;
@@ -176,7 +166,6 @@ public class HHRoutingDB {
 				// ignore non-dual point as they don't exist
 				continue;
 			}
-			pnt.pntGeoId = rs.getLong(p++);
 			pnt.index = rs.getInt(p++);
 			pnt.clusterId = rs.getInt(p++);
 			int chInd = rs.getInt(p++);
@@ -204,46 +193,39 @@ public class HHRoutingDB {
 	}
 	
 	
-	public <T extends NetworkDBPoint> TIntObjectHashMap<List<T>> groupByClusters(TLongObjectHashMap<T> pointsById, boolean out) {
-		TIntObjectHashMap<List<T>> res = new TIntObjectHashMap<>();
-		for (T p : pointsById.valueCollection()) {
-			int cid = out ? p.clusterId : p.dualPoint.clusterId;
-			if (!res.containsKey(cid)) {
-				res.put(cid, new ArrayList<T>());
-			}
-			res.get(cid).add(p);
-		}
-		for(List<T> l : res.valueCollection()) {
-			l.sort(indexComparator);
-		}
-		return res;
-	}
 	
-	public void loadGeometry(NetworkDBSegment segment, boolean reload) throws SQLException {
+	public void loadGeometry(NetworkDBSegment segment, int profile, boolean reload) throws SQLException {
 		if (segment.geom != null && !reload) {
 			return;
 		}
 		List<LatLon> geometry = segment.getGeometry();
 		geometry.clear();
-		if (compactDB) {
-			geometry.add(segment.start.getPoint());
-			geometry.add(segment.end.getPoint());
-			return;
+		geometry.addAll(parseGeometry(segment.start.index, segment.end.index, profile, segment.shortcut));
+	}
+	
+	public void loadSegmentPointInternal(int id, int profile, byte[][] res) throws SQLException {
+		loadSegmentStart.setInt(1, id);
+		loadSegmentStart.setInt(2, profile);
+		ResultSet rs = loadSegmentStart.executeQuery();
+		if (rs.next()) {
+			byte[] ins = rs.getBytes(2);
+			res[0] = ins;
+			byte[] outs = rs.getBytes(3);
+			res[1] = outs;
 		}
-		geometry.addAll(parseGeometry(segment.start.index, segment.end.index, segment.shortcut));
 	}
 	
 	
 	public <T extends NetworkDBPoint> int loadNetworkSegmentPoint(TLongObjectHashMap<T> pntsById, 
 			TIntObjectHashMap<List<T>> clusterInPoints, TIntObjectHashMap<List<T>> clusterOutPoints, 
-			NetworkDBPoint point, boolean reverse) throws SQLException {
+			int profile, NetworkDBPoint point, boolean reverse) throws SQLException {
 		if (point.connected(reverse) != null) {
 			return 0;
 		}
 		int loadedSegs = 0;
 		if (compactDB) {
 			loadSegmentStart.setInt(1, point.index);
-			loadSegmentStart.setInt(2, routingProfile);
+			loadSegmentStart.setInt(2, profile);
 			ResultSet rs = loadSegmentStart.executeQuery();
 			if (rs.next()) {
 				point.connectedSet(true, parseSegments(rs.getBytes(2), pntsById, clusterInPoints.get(point.clusterId), point, false));
@@ -259,7 +241,7 @@ public class HHRoutingDB {
 			@SuppressWarnings("resource")
 			PreparedStatement pre = reverse ? loadSegmentStart : loadSegmentEnd;
 			pre.setInt(1, point.index);
-			pre.setInt(2, routingProfile);
+			pre.setInt(2, profile);
 			ResultSet rs = pre.executeQuery();
 			while (rs.next()) {
 				loadedSegs++;
@@ -278,11 +260,11 @@ public class HHRoutingDB {
 	
 	
 
-	public int loadNetworkSegments(Collection<? extends NetworkDBPoint> points) throws SQLException {
-		return loadNetworkSegmentsInternal(points, false);
+	public int loadNetworkSegments(Collection<? extends NetworkDBPoint> points, int routingProfile) throws SQLException {
+		return loadNetworkSegmentsInternal(points, routingProfile, false);
 	}
 	
-	public int loadNetworkSegmentsInternal(Collection<? extends NetworkDBPoint> points, boolean excludeShortcuts) throws SQLException {
+	public int loadNetworkSegmentsInternal(Collection<? extends NetworkDBPoint> points, int routingProfile, boolean excludeShortcuts) throws SQLException {
 		TLongObjectHashMap<NetworkDBPoint> pntsById = new TLongObjectHashMap<>();
 		for (NetworkDBPoint p : points) {
 			pntsById.put(p.index, p);
@@ -309,11 +291,11 @@ public class HHRoutingDB {
 		return x;
 	}
 
-	private List<LatLon> parseGeometry(int start, int end, boolean shortcut) throws SQLException {
+	private List<LatLon> parseGeometry(int start, int end, int profile, boolean shortcut) throws SQLException {
 		List<LatLon> l = new ArrayList<LatLon>();
 		loadGeometry.setLong(1, start);
 		loadGeometry.setLong(2, end);
-		loadGeometry.setInt(3, routingProfile);
+		loadGeometry.setInt(3, profile);
 		int shortcutN = shortcut ? 1 : 0;
 		ResultSet rs = loadGeometry.executeQuery();
 		while (rs.next()) {
@@ -327,7 +309,7 @@ public class HHRoutingDB {
 				for (int k = 8; k < geom.length; k += 8) {
 					int st = Algorithms.parseIntFromBytes(geom, k);
 					int en = Algorithms.parseIntFromBytes(geom, k + 4);
-					List<LatLon> gg = parseGeometry(st, en, false);
+					List<LatLon> gg = parseGeometry(st, en, profile, false);
 					l.addAll(gg);
 				}
 			} else {
@@ -419,11 +401,11 @@ public class HHRoutingDB {
 	
 	
 	
-	static class NetworkDBPoint {
-		NetworkDBPoint dualPoint;
-		int index;
-		int clusterId;
-		long pntGeoId; // could be calculated
+	public static class NetworkDBPoint {
+		public NetworkDBPoint dualPoint;
+		public int index;
+		public int clusterId;
+		public int fileId;
 		
 		public long roadId;
 		public short start;
@@ -533,6 +515,10 @@ public class HHRoutingDB {
 
 		public int midPntDepth() {
 			return 0;
+		}
+
+		public long getGeoPntId() {
+			return HHRoutePlanner.calculateRoutePointInternalId(roadId, start, end);
 		}
 		
 	}

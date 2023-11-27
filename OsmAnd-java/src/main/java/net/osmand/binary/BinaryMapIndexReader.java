@@ -38,6 +38,7 @@ import net.osmand.data.TransportStop;
 import net.osmand.osm.MapPoiTypes;
 import net.osmand.osm.PoiCategory;
 import net.osmand.osm.edit.Way;
+import net.osmand.router.HHRoutingDB.NetworkDBPoint;
 import net.osmand.util.Algorithms;
 import net.osmand.util.MapUtils;
 
@@ -114,6 +115,7 @@ public class BinaryMapIndexReader {
 	/*private*/ List<AddressRegion> addressIndexes = new ArrayList<AddressRegion>();
 	/*private*/ List<TransportIndex> transportIndexes = new ArrayList<TransportIndex>();
 	/*private*/ List<RouteRegion> routingIndexes = new ArrayList<RouteRegion>();
+	/*private*/ List<HHRouteRegion> hhIndexes = new ArrayList<HHRouteRegion>();
 	/*private*/ List<BinaryIndexPart> indexes = new ArrayList<BinaryIndexPart>();
 	TLongObjectHashMap<IncompleteTransportRoute> incompleteTransportRoutes = null;
 	
@@ -284,9 +286,10 @@ public class BinaryMapIndexReader {
 				hhreg.filePointer = codedIS.getTotalBytesRead();
 				if (hhAdapter != null) {
 					oldLimit = codedIS.pushLimit(hhreg.length);
-					hhAdapter.readHHIndex(hhreg);
+					hhAdapter.readHHIndex(hhreg, false);
 					codedIS.popLimit(oldLimit);
 					indexes.add(hhreg);
+					hhIndexes.add(hhreg);
 				}
 				codedIS.seek(hhreg.filePointer + hhreg.length);
 				break;
@@ -334,6 +337,10 @@ public class BinaryMapIndexReader {
 	
 	public List<RouteRegion> getRoutingIndexes() {
 		return routingIndexes;
+	}
+	
+	public List<HHRouteRegion> getHHRoutingIndexes() {
+		return hhIndexes;
 	}
 
 	public boolean isBasemap() {
@@ -434,7 +441,19 @@ public class BinaryMapIndexReader {
 		}
 		return "";
 	}
+	
+	public <T extends NetworkDBPoint> TLongObjectHashMap<T> initHHPoints(HHRouteRegion r, Class<T> cl) throws IOException {
+		return hhAdapter.initRegionAndLoadPoints(r, cl);
+	}
 
+	public <T extends NetworkDBPoint> int loadNetworkSegmentPoint(HHRouteRegion fileRegion,
+			TLongObjectHashMap<T> pointsById, TLongObjectHashMap<T> pointsByFileId,
+			TIntObjectHashMap<List<T>> clusterInPoints, TIntObjectHashMap<List<T>> clusterOutPoints, int routingProfile,
+			T point, boolean reverse) throws IOException {
+		return hhAdapter.loadNetworkSegmentPoint(fileRegion, pointsById, pointsByFileId, clusterInPoints,
+				clusterOutPoints, routingProfile, point, reverse);
+	}
+	
 	public String getRegionName() {
 		List<String> rg = getRegionNames();
 		if (rg.size() == 0) {
@@ -668,6 +687,7 @@ public class BinaryMapIndexReader {
 			int cityType) throws IOException {
 		return getCities(region, resultMatcher, null, cityType);
 	}
+	
 	public List<City> getCities(AddressRegion region, SearchRequest<City> resultMatcher, StringMatcher matcher,  
 			int cityType) throws IOException {
 		List<City> cities = new ArrayList<City>();
@@ -2833,4 +2853,6 @@ public class BinaryMapIndexReader {
 			}
 		}
 	}
+
+	
 }
