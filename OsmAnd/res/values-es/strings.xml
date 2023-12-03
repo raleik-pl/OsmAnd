@@ -131,7 +131,7 @@
     <string name="vector_data_missing">Descarga los datos («sin conexión») para usar los mapas sin conexión.</string>
     <string name="local_index_gpx_info_show">"
 \n
-\nPulsación larga para opciones"</string>
+\nPulsación larga para las opciones"</string>
     <string name="local_index_installed">Versión local</string>
     <string name="local_index_items_backuped">%1$d de %2$d elemento(s) desactivado(s).</string>
     <string name="local_index_items_deleted">%1$d de %2$d elemento(s) borrado(s).</string>
@@ -1203,7 +1203,7 @@
     <string name="loading_smth">Cargando %1$s…</string>
     <string name="selected_gpx_info_show">"
 \n
-\nToque prolongado para ver en el mapa"</string>
+\nPulsación larga para ver en el mapa"</string>
     <string name="delay_navigation_start">Iniciar automáticamente la navegación giro a giro</string>
     <string name="shared_string_selected_lowercase">marcado(s)</string>
     <string name="gpx_split_interval">Intervalo de división</string>
@@ -1238,7 +1238,7 @@
     <string name="rendering_attr_moreDetailed_name">Más detalles</string>
     <string name="rendering_attr_lessDetailed_name">Menos detalles</string>
     <string name="rendering_attr_hideAccess_name">Restricciones de acceso</string>
-    <string name="rendering_attr_showAccess_name">Restricciones de acceso y peajes</string>
+    <string name="rendering_attr_showAccess_name">Mostrar las restricciones de acceso</string>
     <string name="rendering_attr_showSurfaceGrade_name">Calidad de los caminos</string>
     <string name="rendering_attr_showSurfaces_name">Superficie de los caminos</string>
     <string name="rendering_attr_showCycleRoutes_name">Rutas ciclistas</string>
@@ -2042,7 +2042,6 @@
     <string name="rendering_attr_surfaceIntegrity_name">Integridad de la superficie del camino</string>
     <string name="search_hint">Ingresa nombre de ciudad, dirección o PDI</string>
     <string name="translit_names">Transliterar nombres</string>
-    <string name="edit_filter">Editar categorías</string>
     <string name="subcategories">Subcategorías</string>
     <string name="selected_categories">Categorías elegidas</string>
     <string name="create_custom_poi">Crear filtro personalizado</string>
@@ -2390,7 +2389,7 @@
     <string name="mapillary_image">Imagen de Mapillary</string>
     <string name="shared_string_permissions">Permisos</string>
     <string name="import_gpx_failed_descr">No se pudo importar el archivo. Asegúrese de que OsmAnd tiene permiso para leerlo.</string>
-    <string name="distance_moving">Distancia recorrida</string>
+    <string name="distance_moving">Distancia corregida</string>
     <string name="store_tracks_in_monthly_directories">Guardar las trazas grabadas en carpetas mensuales</string>
     <string name="store_tracks_in_monthly_directories_descrp">Guardar las trazas grabadas en subcarpetas, por mes de grabación (como 2018-01).</string>
     <string name="shared_string_reset">Restablecer</string>
@@ -4797,7 +4796,7 @@
     <string name="ant_read_data">Leer datos</string>
     <string name="ant_write_to_gpx">Escribir datos en la traza</string>
     <string name="ant_heart_rate_write_gpx_desc">Incluye la frecuencia cardíaca en la traza</string>
-    <string name="map_widget_ant_heart_rate">Frecuencia cardíaca</string>
+    <string name="map_widget_ant_heart_rate">Ritmo cardíaco</string>
     <string name="map_widget_ant_bicycle_power">Potencia de la bicicleta</string>
     <string name="map_widget_ant_bicycle_cadence">Cadencia de pedaleo</string>
     <string name="map_widget_ant_bicycle_cadence_desc">Muestra la velocidad a la que pedalea el usuario</string>
@@ -5480,7 +5479,7 @@
     <string name="smart_folder_saved">Carpeta inteligente guardada</string>
     <string name="add_smart_folder">Agregar una carpeta inteligente</string>
     <string name="empty_name">Nombre vacío</string>
-    <string name="edit_fiilter">Editar el filtro</string>
+    <string name="edit_filter">Editar el filtro</string>
     <string name="save_as_smart_folder">Guardar como una carpeta inteligente</string>
     <string name="delete_smart_folder_dialog_message">Esto borrará la carpeta inteligente \"%1$s\".</string>
     <string name="empty_smart_folder_title">No hay pista coincidente</string>
@@ -5568,4 +5567,8 @@
     <string name="reset_key_assignments">Restablecer la asignación de teclas</string>
     <string name="target_elevation">Elevación del objetivo</string>
     <string name="shared_string_eta">ETA</string>
+    <string name="rendering_attr_showToll_name">Mostrar las restricciones del peaje</string>
+    <string name="rendering_attr_showToll_description">Mostrar los peajes en las carreteras</string>
+    <string name="lang_zh_hans">Chino simplificado</string>
+    <string name="lang_zh_hant">Chino tradicional</string>
 </resources>
