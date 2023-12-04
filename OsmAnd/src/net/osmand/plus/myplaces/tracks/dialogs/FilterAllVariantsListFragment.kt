@@ -38,18 +38,21 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 		fun showInstance(
 			app: OsmandApplication,
 			manager: FragmentManager,
-			filter: BaseTrackFilter,
+			filter: ListTrackFilter,
 			dialogClosedListener: DialogClosedListener?,
 			selectedItemsListener: NewSelectedItemsListener) {
 			if (AndroidUtils.isFragmentCanBeAdded(manager, TAG)) {
-//				val initialFilter = TrackFiltersHelper.createFilter(app, filter.filterType, null)
-//				if (initialFilter !is ListTrackFilter) {
-//					throw IllegalArgumentException("Filter should be subclass from ListTrackFilter")
-//				}
-//				initialFilter.initWithValue(filter)
-				val initialFilter = filter.clone()
+				val initialFilter = TrackFiltersHelper.createFilter(app, filter.filterType, null)
+				if (initialFilter !is ListTrackFilter) {
+					throw IllegalArgumentException("Filter should be subclass from ListTrackFilter")
+				}
+				initialFilter.initWithValue(filter)
+//				val initialFilter = filter.clone()
 				val nightMode = app.daynightHelper.isNightMode(true)
-				val currentFilter = filter.clone()
+//				val currentFilter = filter.clone()
+				val currentFilter =
+					TrackFiltersHelper.createFilter(app, filter.filterType, null) as ListTrackFilter
+				currentFilter.initWithValue(filter)
 				currentFilter.setFullItemsCollection(filter.allItemsCollection)
 				val adapter = ListFilterAdapter(app, nightMode, null, null)
 				adapter.filter = currentFilter
@@ -67,14 +70,14 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 		}
 	}
 
-	lateinit var initialFilter: BaseTrackFilter
+	lateinit var initialFilter: ListTrackFilter
 	lateinit var adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
 
 	var progressBar: ProgressBar? = null
 	private var showButton: DialogButton? = null
 	private var dialogClosedListener: DialogClosedListener? = null
 	private lateinit var appBar: AppBarLayout
-	private lateinit var currentChangesFilter: BaseTrackFilter
+	private lateinit var currentChangesFilter: ListTrackFilter
 	private lateinit var selectedItemsListener: NewSelectedItemsListener
 	private val textWatcher: TextWatcher = object : TextWatcher {
 		override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -141,9 +144,9 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 		showButton = view.findViewById(R.id.show_button)
 		showButton?.setOnClickListener {
 			val newSelectedItems = ArrayList<String>()
-			val oldSelectedItems = initialFilter.getSelectedItems()
+			val oldSelectedItems = initialFilter.selectedItems
 			val currentSelectedItems =
-				currentChangesFilter.getSelectedItems()
+				currentChangesFilter.selectedItems
 			for (selectedItem in currentSelectedItems) {
 				if (!oldSelectedItems.contains(selectedItem)) {
 					newSelectedItems.add(selectedItem)
@@ -165,7 +168,7 @@ class FilterAllVariantsListFragment : BaseOsmAndDialogFragment(), SmartFolderUpd
 			setNavigationOnClickListener {
 				closeWithoutApply()
 			}
-			setTitle(currentChangesFilter.displayNameId)
+			setTitle(currentChangesFilter.filterType.nameResId)
 		}
 	}
 

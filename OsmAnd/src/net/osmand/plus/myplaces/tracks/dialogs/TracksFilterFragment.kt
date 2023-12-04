@@ -278,7 +278,7 @@ class TracksFilterFragment : BaseOsmAndDialogFragment(),
 					changed = true
 				} else {
 					for (folderFilter in it) {
-						if (folderFilter != filter.getFilterById(folderFilter.displayNameId)) {
+						if (folderFilter != filter.getFilterById(folderFilter.filterType.nameResId)) {folderFilter.filterType.nameResId
 							changed = true
 							break
 						}

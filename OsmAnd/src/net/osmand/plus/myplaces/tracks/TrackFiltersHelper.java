@@ -1,76 +1,77 @@
 package net.osmand.plus.myplaces.tracks;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 
 import net.osmand.plus.OsmandApplication;
-import net.osmand.plus.R;
-import net.osmand.plus.myplaces.tracks.filters.AverageAltitudeTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.AverageSpeedTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.BaseTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.CityTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.ColorTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.DateCreationTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.DownhillTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.DurationTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.FilterChangedListener;
 import net.osmand.plus.myplaces.tracks.filters.FilterType;
-import net.osmand.plus.myplaces.tracks.filters.LengthTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.MaxAltitudeTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.MaxSpeedTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.MeasureUnitType;
-import net.osmand.plus.myplaces.tracks.filters.OtherTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.TimeInMotionTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.TrackFiltersConstants;
-import net.osmand.plus.myplaces.tracks.filters.TrackFolderFilter;
+import net.osmand.plus.myplaces.tracks.filters.RangeTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.TrackNameFilter;
-import net.osmand.plus.myplaces.tracks.filters.UphillTrackFilter;
-import net.osmand.plus.myplaces.tracks.filters.WidthTrackFilter;
 import net.osmand.plus.track.helpers.GpxParameter;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Date;
 
 public class TrackFiltersHelper {
 
-	public static BaseTrackFilter createNameFilter(FilterChangedListener listener) {
-		return new BaseTrackFilter(R.string.shared_string_name,
-				FilterType.TEXT,
-				MeasureUnitType.NONE,
-				listener,
-				GpxParameter.GPX_COL_NAME,
-				Collections.singletonList(""));
+	public static BaseTrackFilter createNameFilter(FilterType filterType, FilterChangedListener listener) {
+		return new TrackNameFilter(filterType, listener);
 	}
 
-	public static BaseTrackFilter createRangeFilter(FilterChangedListener listener,
-	                                                @StringRes int id,
-	                                                MeasureUnitType measureUnitType,
-	                                                GpxParameter gpxParameter,
-	                                                float minValue,
-	                                                float maxValue,
-	                                                float valueFrom,
-	                                                float valueTo) {
-
-		return new BaseTrackFilter(id,
-				FilterType.RANGE,
-				measureUnitType,
-				listener,
-				gpxParameter,
-				Arrays.asList(minValue,
-						maxValue,
-						valueFrom,
-						valueTo));
+	public static BaseTrackFilter createDateFilter(FilterType filterType, Long minDate, FilterChangedListener listener) {
+		return new DateCreationTrackFilter(filterType, minDate, listener);
 	}
 
+	public static BaseTrackFilter createRangeFilter(OsmandApplication app, FilterType filterType, FilterChangedListener listener) {
+		if (filterType.getDefaultParams().size() < 2) {
+			throw new IllegalArgumentException("RangeTrackFilter needs 2 default params: minValue, maxValue");
+		}
+		Object minValue = filterType.getDefaultParams().get(0);
+		Object maxValue = filterType.getDefaultParams().get(1);
+		Class<?> parameterClass = filterType.getPropertyList().get(0).getTypeClass();
+		if (parameterClass == Double.class) {
+			return new RangeTrackFilter<>((Double)minValue, (Double)maxValue, app, filterType, listener);
+		} else if(parameterClass == Float.class) {
+			return new RangeTrackFilter<>((Float)minValue, (Float)maxValue, app, filterType, listener);
+		} else if(parameterClass == Integer.class) {
+			return new RangeTrackFilter<>((Integer)minValue, (Integer)maxValue, app, filterType, listener);
+		} else if(parameterClass == Long.class) {
+			return new RangeTrackFilter<>((Long)minValue, (Long)maxValue, app, filterType, listener);
+		}
+		throw new IllegalArgumentException("Unsupported gpxParameter type class");
+	}
 
-//	public static BaseTrackFilter createFilter(OsmandApplication app, FilterType filterType, FilterChangedListener filterChangedListener) {
-//		BaseTrackFilter newFilter;
-//
-//		switch (filterType) {
-//			case NAME: {
-//				newFilter = new TrackNameFilter(filterChangedListener);
-//				break;
-//			}
+	public static Comparable<?> getComparableValueForFilter(@NonNull String value, @NonNull GpxParameter gpxParam){
+		if (gpxParam.getTypeClass().equals(Double.class)) {
+			return Double.parseDouble(value);
+		} else if(gpxParam.getTypeClass().equals(Float.class)) {
+			return Float.parseFloat(value);
+		} else if(gpxParam.getTypeClass().equals(Integer.class)) {
+			return Integer.parseInt(value);
+		} else if(gpxParam.getTypeClass().equals(Long.class)) {
+			return Long.parseLong(value);
+		}
+		throw new IllegalArgumentException("Unsupported gpxParameter type class");
+	}
+
+	public static BaseTrackFilter createFilter(OsmandApplication app, FilterType filterType, FilterChangedListener filterChangedListener) {
+		BaseTrackFilter newFilter;
+
+		switch (filterType.getFilterDisplayType()) {
+			case TEXT: {
+				newFilter = createNameFilter(filterType, filterChangedListener);
+				break;
+			}
+			case RANGE: {
+				newFilter = createRangeFilter(app, filterType, filterChangedListener);
+				break;
+			}
+			case DATE_RANGE: {
+				newFilter = createDateFilter(filterType, (new Date()).getTime(), filterChangedListener);
+				break;
+			}
+
 //			case DURATION: {
 //				newFilter = new DurationTrackFilter(
 //						0f,
@@ -166,20 +167,20 @@ public class TrackFiltersHelper {
 //				newFilter = new WidthTrackFilter(app, filterChangedListener);
 //				break;
 //			}
-//			default:
-//				throw new IllegalArgumentException("Unknown filterType " + filterType);
-//		}
-//		return newFilter;
-//	}
+			default:
+				throw new IllegalArgumentException("Unknown filterType " + filterType);
+		}
+		return newFilter;
+	}
 
-//	@NonNull
-//	public static Class<? extends BaseTrackFilter> getFilterClass(FilterType filterType) {
-//		Class<? extends BaseTrackFilter> filterClass = null;
-//		switch (filterType) {
-//			case NAME: {
-//				filterClass = TrackNameFilter.class;
-//				break;
-//			}
+	@NonNull
+	public static Class<? extends BaseTrackFilter> getFilterClass(FilterType filterType) {
+		Class<? extends BaseTrackFilter> filterClass = null;
+		switch (filterType) {
+			case NAME: {
+				filterClass = TrackNameFilter.class;
+				break;
+			}
 //			case FOLDER: {
 //				filterClass = TrackFolderFilter.class;
 //				break;
@@ -240,9 +241,9 @@ public class TrackFiltersHelper {
 //				filterClass = WidthTrackFilter.class;
 //				break;
 //			}
-//			default:
-//				throw new IllegalArgumentException("Unknown filterType " + filterType);
-//		}
-//		return filterClass;
-//	}
+			default:
+				throw new IllegalArgumentException("Unknown filterType " + filterType);
+		}
+		return filterClass;
+	}
 }

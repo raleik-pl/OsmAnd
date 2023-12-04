@@ -8,32 +8,32 @@ import net.osmand.util.Algorithms
 
 abstract class ListTrackFilter(
 	val app: OsmandApplication,
-	displayNameId: Int, filterType: FilterType,
+	filterType: FilterType,
 	filterChangedListener: FilterChangedListener?) :
-	BaseTrackFilter(displayNameId, filterType, filterChangedListener) {
+	BaseTrackFilter(filterType, filterChangedListener) {
 
 	override fun isEnabled(): Boolean {
 		return !Algorithms.isEmpty(selectedItems)
 	}
 
-	//	@Expose
-//	var selectedItems = ArrayList<String>()
-//		protected set
+	@Expose
+	var selectedItems = ArrayList<String>()
+		protected set
 	var allItems: MutableList<String> = arrayListOf()
 		private set
-//	var allItemsCollection: HashMap<String, Int> = hashMapOf()
+	var allItemsCollection: HashMap<String, Int> = hashMapOf()
 
-//	fun setFullItemsCollection(collection: HashMap<String, Int>) {
-//		allItems = ArrayList(collection.keys)
-//		allItemsCollection = collection
-//	}
+	fun setFullItemsCollection(collection: HashMap<String, Int>) {
+		allItems = ArrayList(collection.keys)
+		allItemsCollection = collection
+	}
 
-//	@Expose
-//	var isSelectAllItemsSelected = false
-//		set(value) {
-//			field = value
-//			filterChangedListener?.onFilterChanged()
-//		}
+	@Expose
+	var isSelectAllItemsSelected = false
+		set(value) {
+			field = value
+			filterChangedListener?.onFilterChanged()
+		}
 
 	fun setFullItemsCollection(collection: List<Pair<String, Int>>) {
 		val tmpAllItems = ArrayList<String>()
@@ -46,23 +46,23 @@ abstract class ListTrackFilter(
 		allItemsCollection = tmpAllItemsCollection
 	}
 
-//	fun setSelectedItems(selectedItems: List<String>) {
-//		this.selectedItems = ArrayList(selectedItems)
-//		filterChangedListener?.onFilterChanged()
-//	}
-//
-//	fun setItemSelected(item: String, selected: Boolean) {
-//		if (selected) {
-//			selectedItems.add(item)
-//		} else {
-//			selectedItems.remove(item)
-//		}
-//		filterChangedListener?.onFilterChanged()
-//	}
-//
-//	fun isItemSelected(item: String): Boolean {
-//		return selectedItems.contains(item)
-//	}
+	fun setSelectedItems(selectedItems: List<String>) {
+		this.selectedItems = ArrayList(selectedItems)
+		filterChangedListener?.onFilterChanged()
+	}
+
+	fun setItemSelected(item: String, selected: Boolean) {
+		if (selected) {
+			selectedItems.add(item)
+		} else {
+			selectedItems.remove(item)
+		}
+		filterChangedListener?.onFilterChanged()
+	}
+
+	fun isItemSelected(item: String): Boolean {
+		return selectedItems.contains(item)
+	}
 
 	override fun initWithValue(value: BaseTrackFilter) {
 		if (value is ListTrackFilter) {
@@ -103,11 +103,14 @@ abstract class ListTrackFilter(
 		return null
 	}
 
-//	fun getTracksCountForItem(itemName: String): Int {
-//		return allItemsCollection[itemName] ?: 0
-//	}
-//
+	fun getTracksCountForItem(itemName: String): Int {
+		return allItemsCollection[itemName] ?: 0
+	}
+
 	open fun hasSelectAllVariant(): Boolean {
 		return false
 	}
+
+	var collectionFilterParams: CollectionTrackFilterParams? = null
+
 }

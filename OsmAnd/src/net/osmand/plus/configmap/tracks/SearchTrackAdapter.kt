@@ -197,8 +197,8 @@ class SearchTracksAdapter(
 		if (query == null) {
 			query = "";
 		}
-        if (!query.toString().equals(filter.nameFilter.getValue())) {
-            filter.nameFilter.setValue(query.toString())
+        if (!Algorithms.stringsEqual(query.toString(), filter.nameFilter.value)) {
+            filter.nameFilter.value = query.toString()
             filter.filter(query)
         }
 	}
@@ -217,7 +217,7 @@ class SearchTracksAdapter(
     }
 
 	fun getCurrentSearchQuery(): String {
-		return filter.nameFilter.getValue() as String
+		return filter.nameFilter.value
 	}
 
     fun initSelectedFilters(selectedFilters: List<BaseTrackFilter>?) {

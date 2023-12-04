@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 public class TracksSearchFilter extends Filter implements FilterChangedListener {
 	public static final Log LOG = PlatformUtil.getLog(TracksSearchFilter.class);
@@ -171,8 +172,8 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 	}
 
 
-	public BaseTrackFilter getNameFilter() {
-		return getFilterById(R.string.shared_string_name);
+	public TrackNameFilter getNameFilter() {
+		return (TrackNameFilter) getFilterById(R.string.shared_string_name);
 	}
 
 	public void addFiltersChangedListener(FilterChangedListener listener) {
@@ -193,16 +194,16 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 	}
 
 	public void filter() {
-		BaseTrackFilter nameFilter = getNameFilter();
+		TrackNameFilter nameFilter = getNameFilter();
 		if (nameFilter != null) {
-			filter((String)nameFilter.getValue());
+			filter((String) nameFilter.getValue());
 		}
 	}
 
 	@Nullable
 	public BaseTrackFilter getFilterById(int id) {
 		for (BaseTrackFilter filter : currentFilters) {
-			if (filter.getDisplayNameId() == id) {
+			if (filter.getFilterType().getNameResId() == id) {
 				return filter;
 			}
 		}
@@ -212,102 +213,23 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 	void recreateFilters() {
 		List<BaseTrackFilter> newFiltersFilters = new ArrayList<>();
 //		currentFilters.clear();
-		newFiltersFilters.add(TrackFiltersHelper.createNameFilter(this));
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.duration,
-				MeasureUnitType.TIME_DURATION,
-				GpxParameter.GPX_COL_TIME_SPAN,
-				0f,
-				TrackFiltersConstants.DEFAULT_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.DEFAULT_MAX_VALUE));
-		currentFilters = newFiltersFilters;
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.moving_time,
-				MeasureUnitType.TIME_DURATION,
-				GpxParameter.GPX_COL_TIME_MOVING,
-				0f,
-				TrackFiltersConstants.DEFAULT_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.DEFAULT_MAX_VALUE));
-		currentFilters = newFiltersFilters;
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.routing_attr_length_name,
-				MeasureUnitType.DISTANCE,
-				GpxParameter.GPX_COL_TOTAL_DISTANCE,
-				0f,
-				TrackFiltersConstants.LENGTH_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.LENGTH_MAX_VALUE));
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.routing_attr_length_name,
-				MeasureUnitType.DISTANCE,
-				GpxParameter.GPX_COL_TOTAL_DISTANCE,
-				0f,
-				TrackFiltersConstants.LENGTH_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.LENGTH_MAX_VALUE));
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.average_speed,
-				MeasureUnitType.SPEED,
-				GpxParameter.GPX_COL_AVG_SPEED,
-				0f,
-				TrackFiltersConstants.DEFAULT_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.DEFAULT_MAX_VALUE));
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.max_speed,
-				MeasureUnitType.SPEED,
-				GpxParameter.GPX_COL_MAX_SPEED,
-				0f,
-				TrackFiltersConstants.DEFAULT_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.DEFAULT_MAX_VALUE));
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.shared_string_uphill,
-				MeasureUnitType.ALTITUDE,
-				GpxParameter.GPX_COL_DIFF_ELEVATION_UP,
-				0f,
-				TrackFiltersConstants.ALTITUDE_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.ALTITUDE_MAX_VALUE));
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.shared_string_downhill,
-				MeasureUnitType.ALTITUDE,
-				GpxParameter.GPX_COL_DIFF_ELEVATION_DOWN,
-				0f,
-				TrackFiltersConstants.ALTITUDE_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.ALTITUDE_MAX_VALUE));
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.average_altitude,
-				MeasureUnitType.ALTITUDE,
-				GpxParameter.GPX_COL_AVG_ELEVATION,
-				0f,
-				TrackFiltersConstants.ALTITUDE_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.ALTITUDE_MAX_VALUE));
-
-		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
-				R.string.max_altitude,
-				MeasureUnitType.ALTITUDE,
-				GpxParameter.GPX_COL_MAX_ELEVATION,
-				0f,
-				TrackFiltersConstants.ALTITUDE_MAX_VALUE,
-				0f,
-				TrackFiltersConstants.ALTITUDE_MAX_VALUE));
+		LOG.debug("recreateFilters");
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.NAME, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.DURATION, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.TIME_IN_MOTION, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.LENGTH, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_SPEED, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.MAX_SPEED, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.UPHILL, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.DOWNHILL, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_ALTITUDE, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.MAX_ALTITUDE, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.DATE_CREATION, this));
 
 
-					long minDate = (new Date()).getTime();//app.getGpxDbHelper().getTracksMinCreateDate();
-			long now = (new Date()).getTime();
+
+		long minDate = app.getGpxDbHelper().getTracksMinCreateDate();
+		long now = (new Date()).getTime();
 
 //		newFiltersFilters.add(TrackFiltersHelper.createRangeFilter(this,
 //				R.string.date_of_creation,
@@ -318,8 +240,6 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 //				minDate,
 //				now));
 //
-
-
 
 
 		currentFilters = newFiltersFilters;

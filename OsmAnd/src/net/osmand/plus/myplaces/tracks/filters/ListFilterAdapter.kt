@@ -36,7 +36,7 @@ class ListFilterAdapter(
 	var showAllItems = false
 	private var additionalItems = ArrayList<String>()
 	lateinit var fragmentManager: FragmentManager
-	lateinit var filter: BaseTrackFilter
+	lateinit var filter: ListTrackFilter
 	private var isSelectAllItemsBeingSet = false
 
 	private val newSelectedItemsListener =
@@ -110,12 +110,12 @@ class ListFilterAdapter(
 				holder.icon.setImageDrawable(icon)
 				AndroidUiHelper.updateVisibility(holder.icon, icon != null)
 				AndroidUiHelper.updateVisibility(holder.divider, position != itemCount - 1)
-				holder.itemView.setOnClickListener {
-					filter.setItemSelected(itemName, !filter.isItemSelected(itemName))
-					this.notifyItemChanged(position)
-				}
-				holder.count.text = filter.getTracksCountForItem(itemName).toString()
-				holder.checkBox.isChecked = filter.isItemSelected(itemName)
+//				holder.itemView.setOnClickListener {
+//					filter.setItemSelected(itemName, !filter.isItemSelected(itemName))
+//					this.notifyItemChanged(position)
+//				}
+//				holder.count.text = filter.getTracksCountForItem(itemName).toString()
+//				holder.checkBox.isChecked = filter.isItemSelected(itemName)
 			}
 
 			is SelectAllViewHolder -> {
@@ -150,13 +150,13 @@ class ListFilterAdapter(
 	private fun onAllFolderSelected(checkbox: ThreeStateCheckbox, selected: Boolean) {
 		if (isSelectAllItemsBeingSet) return
 		filter.isSelectAllItemsSelected = selected
-		if (selected) {
-			checkbox.state = ThreeStateCheckbox.State.CHECKED
-			filter.addSelectedItems(ArrayList(filter.allItemsCollection.keys))
-		} else {
-			filter.clearSelectedItems()
-			checkbox.state = ThreeStateCheckbox.State.UNCHECKED
-		}
+//		if (selected) {
+//			checkbox.state = ThreeStateCheckbox.State.CHECKED
+//			filter.addSelectedItems(ArrayList(filter.allItemsCollection.keys))
+//		} else {
+//			filter.clearSelectedItems()
+//			checkbox.state = ThreeStateCheckbox.State.UNCHECKED
+//		}
 		notifyDataSetChanged()
 		filterChangedListener?.onFilterChanged()
 

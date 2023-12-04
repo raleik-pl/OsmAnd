@@ -10,15 +10,12 @@ import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.myplaces.tracks.TracksSearchFilter
 import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterCityViewHolder
-import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterColorViewHolder
 import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterDateViewHolder
 import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterDurationViewHolder
-import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterFolderViewHolder
 import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterNameViewHolder
 import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterNameViewHolder.TextChangedListener
 import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterOtherViewHolder
 import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterRangeViewHolder
-import net.osmand.plus.myplaces.tracks.filters.viewholders.FilterWidthViewHolder
 import net.osmand.plus.utils.UiUtilities
 
 class FiltersAdapter(
@@ -34,23 +31,23 @@ class FiltersAdapter(
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 		val inflater = UiUtilities.getInflater(parent.context, nightMode)
 
-		return when (FilterType.values()[viewType]) {
-			FilterType.TEXT -> {
+		return when (FilterDisplayType.values()[viewType]) {
+			FilterDisplayType.TEXT -> {
 				val view = inflater.inflate(R.layout.filter_name_item, parent, false)
 				FilterNameViewHolder(view, nightMode)
 			}
 
-			FilterType.RANGE -> {
+			FilterDisplayType.RANGE -> {
 				val view = inflater.inflate(R.layout.filter_range_item, parent, false)
 				FilterRangeViewHolder(view, nightMode)
 			}
 
-			FilterType.DATE_RANGE -> {
+			FilterDisplayType.DATE_RANGE -> {
 				val view = inflater.inflate(R.layout.filter_date_item, parent, false)
 				FilterDateViewHolder(view, nightMode)
 			}
 
-			FilterType.SINGLE_FIELD_LIST -> {
+			FilterDisplayType.SINGLE_FIELD_LIST -> {
 				val view = inflater.inflate(R.layout.filter_single_field_list_item, parent, false)
 				FilterCityViewHolder(
 					app,
@@ -58,31 +55,35 @@ class FiltersAdapter(
 					nightMode)
 			}
 
-			FilterType.MULTI_FIELD_LIST -> {
+			FilterDisplayType.MULTI_FIELD_LIST -> {
 				val view = inflater.inflate(R.layout.filter_other_item, parent, false)
 				FilterOtherViewHolder(view, nightMode)
 			}
+
+			//todo remove
+			else -> {val view = inflater.inflate(R.layout.filter_date_item, parent, false)
+				FilterDateViewHolder(view, nightMode)}
 		}
 	}
 
 	override fun getItemViewType(position: Int): Int {
 		val filter = items[position]
-		return filter.filterType.ordinal
+		return filter.filterType.filterDisplayType.ordinal
 	}
 
 	override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 		val item = items[position]
 		if (holder is FilterNameViewHolder) {
-			holder.bindView(item.getValue() as String,
+			holder.bindView((item as TrackNameFilter).value,
 				object : TextChangedListener {
 					override fun onTextChanged(newText: String) {
-						item.setValue(newText)
+						item.value = newText
 					}
 				})
-		} else if (holder is FilterDurationViewHolder) {
-			holder.bindView(item as DurationTrackFilter)
+//		} else if (holder is FilterDurationViewHolder) {
+//			holder.bindView(item as RangeTrackFilter<*>)
 		} else if (holder is FilterRangeViewHolder) {
-			holder.bindView(item)
+			holder.bindView(item as RangeTrackFilter<*>)
 //			if (item.filterType == FilterType.TIME_IN_MOTION) {
 //				holder.bindView(item as TimeInMotionTrackFilter)
 //			} else if (item.filterType == FilterType.LENGTH) {
@@ -100,18 +101,18 @@ class FiltersAdapter(
 //			} else if (item.filterType == FilterType.DOWNHILL) {
 //				holder.bindView(item as DownhillTrackFilter)
 //			}
-		} else if (holder is FilterDateViewHolder) {
-			holder.bindView(item as DateCreationTrackFilter, activity)
-		} else if (holder is FilterCityViewHolder) {
-			holder.bindView(item as CityTrackFilter, fragmentManager)
-		} else if (holder is FilterColorViewHolder) {
-			holder.bindView(item as ColorTrackFilter, fragmentManager)
-		} else if (holder is FilterWidthViewHolder) {
-			holder.bindView(item as WidthTrackFilter, fragmentManager)
-		} else if (holder is FilterFolderViewHolder) {
-			holder.bindView(item as TrackFolderFilter, fragmentManager)
-		} else if (holder is FilterOtherViewHolder) {
-			holder.bindView(item as OtherTrackFilter)
+//		} else if (holder is FilterDateViewHolder) {
+//			holder.bindView(item as DateCreationTrackFilter, activity)
+//		} else if (holder is FilterCityViewHolder) {
+//			holder.bindView(item as CityTrackFilter, fragmentManager)
+//		} else if (holder is FilterColorViewHolder) {
+//			holder.bindView(item as ColorTrackFilter, fragmentManager)
+//		} else if (holder is FilterWidthViewHolder) {
+//			holder.bindView(item as WidthTrackFilter, fragmentManager)
+//		} else if (holder is FilterFolderViewHolder) {
+//			holder.bindView(item as TrackFolderFilter, fragmentManager)
+//		} else if (holder is FilterOtherViewHolder) {
+//			holder.bindView(item as OtherTrackFilter)
 		}
 	}
 

@@ -1,26 +1,27 @@
 package net.osmand.plus.myplaces.tracks.filters
 
 import com.google.gson.annotations.Expose
+import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.configmap.tracks.TrackItem
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DateCreationTrackFilter(filterChangedListener: FilterChangedListener?) :
-	BaseTrackFilter(R.string.date_of_creation, FilterType.TEXT, filterChangedListener) {
-	var initialValueFrom = Date().time
+class DateCreationTrackFilter(filterType: FilterType, dateFrom: Long, filterChangedListener: FilterChangedListener?) :
+	BaseTrackFilter(filterType, filterChangedListener) {
+	var initialValueFrom = dateFrom
 	var initialValueTo = Date().time
 
 	@Expose
-	var valueFrom = Date().time
+	var valueFrom = initialValueFrom
 		set(value) {
 			field = value
 			filterChangedListener?.onFilterChanged()
 		}
 
 	@Expose
-	var valueTo = Date().time
+	var valueTo = initialValueTo
 		set(value) {
 			field = value
 			filterChangedListener?.onFilterChanged()

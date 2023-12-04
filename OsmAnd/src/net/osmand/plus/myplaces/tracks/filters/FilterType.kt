@@ -1,26 +1,112 @@
 package net.osmand.plus.myplaces.tracks.filters
 
-enum class FilterType {
-	DATE_RANGE,
-	SINGLE_FIELD_LIST,
-	MULTI_FIELD_LIST,
-	RANGE,
-	TEXT
+import androidx.annotation.StringRes
+import net.osmand.plus.R
+import net.osmand.plus.track.helpers.GpxParameter
+import java.util.Collections
 
-//	NAME, *
-//	DURATION,*
-//	TIME_IN_MOTION,*
-//	LENGTH,*
-//	AVERAGE_SPEED,*
-//	MAX_SPEED,*
-//	UPHILL,*
-//	DOWNHILL,*
-//	AVERAGE_ALTITUDE,*
-//	MAX_ALTITUDE,*
-//	DATE_CREATION,
-//	FOLDER,
-//	CITY,
-//	COLOR,
-//	WIDTH,
-//	OTHER
+enum class FilterType(
+	@StringRes val nameResId: Int,
+	val filterDisplayType: FilterDisplayType,
+	val propertyList: List<GpxParameter>,
+	val measureUnitType: MeasureUnitType,
+	val defaultParams: List<Any>?) {
+	NAME(
+		R.string.shared_string_name,
+		FilterDisplayType.TEXT,
+		Collections.singletonList(GpxParameter.GPX_COL_NAME),
+		MeasureUnitType.NONE,
+		null),
+	DURATION(
+		R.string.duration,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_TIME_SPAN),
+		MeasureUnitType.TIME_DURATION,
+		listOf(0L, TrackFiltersConstants.DEFAULT_MAX_VALUE.toLong())),
+	TIME_IN_MOTION(
+		R.string.moving_time,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_TIME_MOVING),
+		MeasureUnitType.TIME_DURATION,
+		listOf(0L, TrackFiltersConstants.DEFAULT_MAX_VALUE.toLong())),
+	LENGTH(
+		R.string.routing_attr_length_name,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_TOTAL_DISTANCE),
+		MeasureUnitType.DISTANCE,
+		listOf(0.0, TrackFiltersConstants.LENGTH_MAX_VALUE.toDouble())),
+	AVERAGE_SPEED(
+		R.string.average_speed,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_AVG_SPEED),
+		MeasureUnitType.SPEED,
+		listOf(0.0, TrackFiltersConstants.SPEED_MAX_VALUE.toDouble())),
+	MAX_SPEED(
+		R.string.max_speed,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_MAX_SPEED),
+		MeasureUnitType.SPEED,
+		listOf(0.0, TrackFiltersConstants.SPEED_MAX_VALUE.toDouble())),
+	UPHILL(
+		R.string.shared_string_uphill,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_DIFF_ELEVATION_UP),
+		MeasureUnitType.ALTITUDE,
+		listOf(0.0, TrackFiltersConstants.ALTITUDE_MAX_VALUE.toDouble())),
+	DOWNHILL(
+		R.string.shared_string_downhill,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_DIFF_ELEVATION_DOWN),
+		MeasureUnitType.ALTITUDE,
+		listOf(0.0, TrackFiltersConstants.ALTITUDE_MAX_VALUE.toDouble())),
+	AVERAGE_ALTITUDE(
+		R.string.average_altitude,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_AVG_ELEVATION),
+		MeasureUnitType.ALTITUDE,
+		listOf(0.0, TrackFiltersConstants.ALTITUDE_MAX_VALUE.toDouble())),
+	MAX_ALTITUDE(
+		R.string.max_altitude,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_MAX_ELEVATION),
+		MeasureUnitType.ALTITUDE,
+		listOf(0.0, TrackFiltersConstants.ALTITUDE_MAX_VALUE.toDouble())),
+	DATE_CREATION(
+		R.string.date_of_creation,
+		FilterDisplayType.DATE_RANGE,
+		Collections.singletonList(GpxParameter.GPX_COL_FILE_CREATION_TIME),
+		MeasureUnitType.NONE,
+		null),
+	FOLDER(
+		R.string.folder,
+		FilterDisplayType.SINGLE_FIELD_LIST,
+		Collections.singletonList(GpxParameter.GPX_COL_DIR),
+		MeasureUnitType.NONE,
+		null),
+	CITY(
+		R.string.nearest_cities,
+		FilterDisplayType.SINGLE_FIELD_LIST,
+		Collections.singletonList(GpxParameter.GPX_COL_NEAREST_CITY_NAME),
+		MeasureUnitType.NONE,
+		null),
+	COLOR(
+		R.string.shared_string_color,
+		FilterDisplayType.SINGLE_FIELD_LIST,
+		Collections.singletonList(GpxParameter.GPX_COL_COLOR),
+		MeasureUnitType.NONE,
+		null),
+	WIDTH(
+		R.string.shared_string_width,
+		FilterDisplayType.SINGLE_FIELD_LIST,
+		Collections.singletonList(GpxParameter.GPX_COL_WIDTH),
+		MeasureUnitType.NONE,
+		null),
+	OTHER(
+		R.string.shared_string_other,
+		FilterDisplayType.MULTI_FIELD_LIST,
+		Collections.emptyList(),
+		MeasureUnitType.NONE,
+		null)
+
+
 }

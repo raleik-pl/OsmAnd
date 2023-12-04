@@ -9,8 +9,8 @@ import net.osmand.plus.OsmandApplication
 import net.osmand.plus.R
 import net.osmand.plus.helpers.AndroidUiHelper
 import net.osmand.plus.myplaces.tracks.DialogClosedListener
-import net.osmand.plus.myplaces.tracks.filters.CityTrackFilter
 import net.osmand.plus.myplaces.tracks.filters.ListFilterAdapter
+import net.osmand.plus.myplaces.tracks.filters.ListTrackFilter
 import net.osmand.plus.widgets.TextViewEx
 
 class FilterCityViewHolder(var app: OsmandApplication, itemView: View, nightMode: Boolean) :
@@ -23,7 +23,7 @@ class FilterCityViewHolder(var app: OsmandApplication, itemView: View, nightMode
 	private val titleContainer: View
 	private val divider: View
 	private val explicitIndicator: ImageView
-	private var filter: CityTrackFilter? = null
+	private var filter: ListTrackFilter? = null
 
 	private val filterPropertiesClosed = object : DialogClosedListener {
 		override fun onDialogClosed() {
@@ -46,11 +46,11 @@ class FilterCityViewHolder(var app: OsmandApplication, itemView: View, nightMode
 		recycler = itemView.findViewById(R.id.variants)
 	}
 
-	fun bindView(filter: CityTrackFilter, fragmentManager: FragmentManager) {
+	fun bindView(filter: ListTrackFilter, fragmentManager: FragmentManager) {
 		this.filter = filter
 		adapter.filter = filter
 		adapter.fragmentManager = fragmentManager
-		title.setText(filter.displayNameId)
+		title.setText(filter.filterType.nameResId)
 		updateExpandState()
 		updateValues()
 	}

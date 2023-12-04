@@ -58,7 +58,7 @@ class FilterOtherViewHolder(itemView: View, nightMode: Boolean) :
 
 	fun bindView(filter: OtherTrackFilter) {
 		this.filter = filter
-		title.setText(filter.displayNameId)
+		title.setText(filter.filterType.nameResId)
 		visibleOnMapRow.setOnClickListener {
 			filter.isVisibleOnMap = !filter.isVisibleOnMap
 			updateValues()
