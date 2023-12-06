@@ -1,15 +1,17 @@
 package net.osmand.plus.myplaces.tracks.filters
 
 import com.google.gson.annotations.Expose
+import com.google.gson.reflect.TypeToken
+import net.osmand.CorwinLogger
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.configmap.tracks.TrackItem
 import net.osmand.plus.settings.enums.MetricsConstants
 import net.osmand.plus.track.helpers.GpxParameter
 import net.osmand.plus.utils.OsmAndFormatter
 import net.osmand.plus.utils.OsmAndFormatter.FormattedValue
-import java.lang.IllegalArgumentException
 import kotlin.math.ceil
 import kotlin.math.floor
+
 
 open class RangeTrackFilter<T : Comparable<T>>(
 	minValue: T,
@@ -117,13 +119,16 @@ open class RangeTrackFilter<T : Comparable<T>>(
 	}
 
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
-		val value = trackItem.dataItem?.gpxData?.getValue(filterType.propertyList[0]) as T
-		if (value == null) {
-			return false
+		val value = trackItem.dataItem?.gpxData?.getValue(filterType.propertyList[0]) ?: return false
+
+		if(trackItem.name.contains("zhzh")) {
+			CorwinLogger.log("sss")
 		}
-		return value > valueFrom && value < valueTo
-				|| value < minValue && valueFrom == minValue
-				|| value > maxValue && valueTo == maxValue
+		val comparableValue = getComparableValue(value)
+
+		return comparableValue in valueFrom..valueTo
+				|| comparableValue < minValue && valueFrom == minValue
+				|| comparableValue > maxValue && valueTo == maxValue
 	}
 
 	override fun initWithValue(value: BaseTrackFilter) {
@@ -162,8 +167,6 @@ open class RangeTrackFilter<T : Comparable<T>>(
 	open fun getDisplayMinValue(): Int {
 		val formattedValue = getFormattedValue(flor(minValue))
 		return formattedValue.valueSrc.toInt()
-
-//		return flor(minValue)
 	}
 
 	private fun flor(value: T): String {
@@ -200,16 +203,17 @@ open class RangeTrackFilter<T : Comparable<T>>(
 
 	open fun getDisplayMaxValue(): Int {
 		val formattedValue = getFormattedValue(ceil(maxValue))
+		return formattedValue.valueSrc.toInt() + 1
+	}
+
+	open fun getDisplayValueFrom(): Int {
+		val formattedValue = getFormattedValue(flor(valueFrom))
 		return formattedValue.valueSrc.toInt()
 	}
 
-	open fun getDisplayValueFrom(): String {
-		return flor(valueFrom)
-	}
-
-	open fun getDisplayValueTo(): String {
+	open fun getDisplayValueTo(): Int {
 		val formattedValue = getFormattedValue(ceil(valueTo))
-		return formattedValue.valueSrc.toString()
+		return formattedValue.valueSrc.toInt()
 	}
 
 	private fun getFormattedValue(value: String): FormattedValue {
@@ -235,7 +239,7 @@ open class RangeTrackFilter<T : Comparable<T>>(
 		return filterType.propertyList[0]
 	}
 
-	private fun getComparableValue(value: T): T {
+	private fun getComparableValue(value: Any): T {
 		if(value is Number) {
 			return if (getProperty().typeClass == java.lang.Integer::class.java) {
 				check(value.toInt()) as T
@@ -310,4 +314,21 @@ open class RangeTrackFilter<T : Comparable<T>>(
 			throw IllegalArgumentException("Can not cast $value to $paramType")
 		}
 	}
+
+	inline fun <reified T> checkType(clazz: Class<*>): Boolean {
+		return T::class.java == clazz
+	}
+
+//
+//	open fun <T : Comparable<T>> castList(clazz: Class<out T>, rawCollection: Collection<*>): RangeTrackFilter<T>? {
+//		val result: MutableList<T> = ArrayList(rawCollection.size)
+//		for (o in rawCollection) {
+//			try {
+//				result.add(clazz.cast(o))
+//			} catch (e: java.lang.ClassCastException) {
+//				// log the exception or other error handling
+//			}
+//		}
+//		return result
+//	}
 }

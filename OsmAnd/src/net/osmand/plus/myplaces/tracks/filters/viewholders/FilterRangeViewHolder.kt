@@ -109,9 +109,10 @@ open class FilterRangeViewHolder(
 			override fun afterTextChanged(newText: Editable) {
 				super.afterTextChanged(newText)
 				if (!Algorithms.isEmpty(newText) && Algorithms.isInt(newText.toString())) {
-					val newValue = newText.toString()
+					val newValue = newText.toString().toInt()
 					if (filter.getDisplayValueFrom() != newValue
-						&& filter.isLessThen(newValue, filter.valueTo)
+						&& filter.valueTo is Number
+						&& newValue < (filter.valueTo as Number).toInt()
 						&& !isSliderDragging) {
 						filter.setValueFrom(newValue.toFloat())
 						updateValues()
@@ -124,9 +125,10 @@ open class FilterRangeViewHolder(
 			override fun afterTextChanged(newText: Editable) {
 				super.afterTextChanged(newText)
 				if (!Algorithms.isEmpty(newText) && Algorithms.isInt(newText.toString())) {
-					val newValue = newText.toString()
+					val newValue = newText.toString().toInt()
 					if (filter.getDisplayValueTo() != newValue
-						&& filter.isMoreThen(newValue, filter.valueFrom)
+						&& filter.valueFrom is Number
+						&& newValue > (filter.valueFrom as Number).toInt()
 						&& !isSliderDragging) {
 						filter.setValueTo(newValue.toString())
 						updateValues()
@@ -166,9 +168,9 @@ open class FilterRangeViewHolder(
 		slider.valueTo = maxValue.toFloat()
 		slider.valueFrom = minValue.toFloat()
 		slider.setValues(valueFrom.toFloat(), valueTo.toFloat())
-		valueFromInput.setText(valueFrom)
+		valueFromInput.setText(valueFrom.toString())
 		valueFromInput.setSelection(valueFromInput.length())
-		valueToInput.setText(valueTo)
+		valueToInput.setText(valueTo.toString())
 		valueToInput.setSelection(valueToInput.length())
 		val minValuePrompt =
 			"${decimalFormat.format(minValue.toFloat())} ${app.getString(getFilterUnit())}"
@@ -177,7 +179,7 @@ open class FilterRangeViewHolder(
 		minFilterValue.text = minValuePrompt
 		maxFilterValue.text = maxValuePrompt
 		AndroidUiHelper.updateVisibility(selectedValue, filter.isEnabled())
-		updateSelectedValue(valueFrom, valueTo)
+		updateSelectedValue(valueFrom.toString(), valueTo.toString())
 	}
 
 	open fun updateSelectedValue(valueFrom: String, valueTo: String) {

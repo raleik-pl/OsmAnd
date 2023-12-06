@@ -28,7 +28,7 @@ public enum GpxParameter {
 	GPX_COL_FILE_LAST_UPLOADED_TIME("fileLastUploadedTime", "long", Long.class, 0L),
 	GPX_COL_FILE_CREATION_TIME("fileCreationTime", "long", Long.class, -1L),
 	GPX_COL_SPLIT_TYPE("splitType", "int", Integer.class, 0),
-	GPX_COL_SPLIT_INTERVAL("splitInterval", "double", Double.class, 0),
+	GPX_COL_SPLIT_INTERVAL("splitInterval", "double", Double.class, 0.0),
 	GPX_COL_API_IMPORTED("apiImported", "int", Boolean.class, false),  // 1 = true, 0 = false
 	GPX_COL_WPT_CATEGORY_NAMES("wptCategoryNames", "TEXT", String.class, null),
 	GPX_COL_SHOW_AS_MARKERS("showAsMarkers", "int", Boolean.class, false),  // 1 = true, 0 = false

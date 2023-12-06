@@ -37,6 +37,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -112,6 +113,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1405,4 +1407,16 @@ public class AndroidUtils {
 		BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
 		return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
 	}
+
+	public static <T> T checkCast(Class<T> clazz, Object o) {
+		T result = null;
+		try {
+			result = clazz.cast(o);
+		}
+		catch (ClassCastException e) {
+			LOG.error(o + " can not be cast to " + clazz);
+		}
+		return result;
+	}
+
 }

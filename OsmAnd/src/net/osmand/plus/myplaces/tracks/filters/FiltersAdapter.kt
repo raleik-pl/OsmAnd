@@ -101,8 +101,8 @@ class FiltersAdapter(
 //			} else if (item.filterType == FilterType.DOWNHILL) {
 //				holder.bindView(item as DownhillTrackFilter)
 //			}
-//		} else if (holder is FilterDateViewHolder) {
-//			holder.bindView(item as DateCreationTrackFilter, activity)
+		} else if (holder is FilterDateViewHolder) {
+			holder.bindView(item as DateCreationTrackFilter, activity)
 //		} else if (holder is FilterCityViewHolder) {
 //			holder.bindView(item as CityTrackFilter, fragmentManager)
 //		} else if (holder is FilterColorViewHolder) {
