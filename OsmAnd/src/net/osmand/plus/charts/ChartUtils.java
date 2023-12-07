@@ -689,7 +689,7 @@ public class ChartUtils {
 		MetricsConstants mc = settings.METRIC_SYSTEM.get();
 		boolean useFeet = (mc == MetricsConstants.MILES_AND_FEET) || (mc == MetricsConstants.MILES_AND_YARDS) || (mc == MetricsConstants.NAUTICAL_MILES_AND_FEET);
 		float convEle = useFeet ? 3.28084f : 1.0f;
-		float totalDistance = calcWithoutGaps ? analysis.totalDistanceWithoutGaps : analysis.totalDistance;
+		double totalDistance = calcWithoutGaps ? analysis.totalDistanceWithoutGaps : analysis.totalDistance;
 
 		float divX = getDivX(app, chart, analysis, axisType, calcWithoutGaps);
 

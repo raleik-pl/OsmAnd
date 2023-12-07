@@ -46,7 +46,10 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 	static int DEBUG_ALT_ROUTE_SELECTION = -1;
 	static final double MINIMAL_COST = 0.01;
 	private static final int PNT_SHORT_ROUTE_START_END = -1000;
+	public static final int MAX_POINTS_CLUSTER_ROUTING = 150000;
 	
+	private static boolean ASSERT_COST_INCREASING = false;
+	private static boolean ASSERT_AND_CORRECT_DIST_SMALLER = true;
 	HHRoutingContext<T> cacheHctx;
 	private final Class<T> pointClass;
 	
@@ -119,7 +122,7 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 			c.calcDetailed(2);
 //			c.calcAlternative();
 //			c.gc();
-			DEBUG_VERBOSE_LEVEL = 0;
+//			DEBUG_VERBOSE_LEVEL = 2;
 //			DEBUG_ALT_ROUTE_SELECTION++;
 			c.ALT_EXCLUDE_RAD_MULT_IN = 1;
 			c.ALT_EXCLUDE_RAD_MULT = 0.05;
@@ -135,9 +138,7 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 		config = prepareDefaultRoutingConfig(config);
 		HHRoutingContext<T> hctx = initHCtx(config, start, end);
 		if (hctx == null) {
-			HHNetworkRouteRes res = new HHNetworkRouteRes();
-			res.error = "Files for hh routing were not initialized. Route couldn't be calculated.";
-			return res;
+			return new HHNetworkRouteRes("Files for hh routing were not initialized. Route couldn't be calculated.");
 		}
 		if (hctx.config.USE_GC_MORE_OFTEN) {
 			printGCInformation();
@@ -188,11 +189,12 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 		time = System.nanoTime();
 		System.out.println(hctx.config.toString(start, end));
 		System.out.printf("Calculate turns...");
+		RouteResultPreparation resultPreparation = new RouteResultPreparation();
 		if (hctx.config.ROUTE_ALL_SEGMENTS && route.detailed != null) {
-			route.detailed = new RouteResultPreparation().prepareResult(hctx.rctx, route.detailed);
+			route.detailed = resultPreparation.prepareResult(hctx.rctx, route.detailed).detailed;
 		}
 		System.out.printf("%.2f ms\n", (System.nanoTime() - time) / 1e6);
-//			RouteResultPreparation.printResults(ctx, start, end, route.detailed);
+		RouteResultPreparation.printResults(hctx.rctx, start, end, route.detailed);
 		
 		System.out.printf("Routing finished all %.1f ms: last mile %.1f ms, load data %.1f ms (%,d edges), routing %.1f ms (queue  - %.1f add ms + %.1f poll ms), prep result %.1f ms\n",
 				(System.nanoTime() - startTime) / 1e6, hctx.stats.searchPointsTime,
@@ -576,6 +578,7 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 			
 			return pnts;
 		}
+		hctx.rctx.config.MAX_VISITED = MAX_POINTS_CLUSTER_ROUTING;
 		hctx.rctx.config.planRoadDirection = reverse ? -1 : 1;
 		hctx.rctx.config.heuristicCoefficient = 0; // dijkstra
 		hctx.rctx.unloadAllData(); // needed for proper multidijsktra work
@@ -583,6 +586,7 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 		BinaryRoutePlanner planner = new BinaryRoutePlanner();
 		MultiFinalRouteSegment frs = (MultiFinalRouteSegment) planner.searchRouteInternal(hctx.rctx,
 				reverse ? null : s, reverse ? s : null, hctx.boundaries);
+		hctx.rctx.config.MAX_VISITED = -1;
 		System.out.println(hctx.rctx.calculationProgress.getInfo(null));		
 		if (frs != null) {
 			TLongSet set = new TLongHashSet();
@@ -791,10 +795,24 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 			if (hctx.config.USE_MIDPOINT && Math.min(depth, hctx.config.MIDPOINT_MAX_DEPTH) > nextPoint.midPntDepth() + hctx.config.MIDPOINT_ERROR) {
 				continue;
 			}
-			double cost = point.rt(reverse).rtDistanceFromStart  + connected.dist + distanceToEnd(hctx, reverse, nextPoint) ;
+			double segmentDist = connected.dist;
+			if (ASSERT_AND_CORRECT_DIST_SMALLER && hctx.config.HEURISTIC_COEFFICIENT > 0
+					&& smallestSegmentCost(hctx, point, nextPoint) - segmentDist >  1) {
+				double smallestSegmentCost = smallestSegmentCost(hctx, point, nextPoint);
+				// TODO lots of incorrect distance in db 
+				System.err.printf("Incorrect distance %s -> %s: db = %.2f > fastest %.2f \n", point, nextPoint, segmentDist, smallestSegmentCost);
+				segmentDist = smallestSegmentCost;
+			}
+			double cost = point.rt(reverse).rtDistanceFromStart  + segmentDist + distanceToEnd(hctx, reverse, nextPoint);
+			if (ASSERT_COST_INCREASING && point.rt(reverse).rtCost - cost > 1) {
+				String msg = String.format("%s (cost %.2f) -> %s (cost %.2f) st=%.2f-> + %.2f, toend=%.2f->%.2f: ",
+						point, point.rt(reverse).rtCost, nextPoint, cost, point.rt(reverse).rtDistanceFromStart,
+						connected.dist, point.rt(reverse).rtDistanceToEnd, distanceToEnd(hctx, reverse, nextPoint));
+				throw new IllegalStateException(msg);
+			}
 			double exCost = nextPoint.rt(reverse).rtCost;
 			if ((exCost == 0 && !nextPoint.rt(reverse).rtVisited) || cost < exCost) {
-				addPointToQueue(hctx, queue, reverse, nextPoint, point, connected.dist, cost);
+				addPointToQueue(hctx, queue, reverse, nextPoint, point, segmentDist, cost);
 			}
 		}
 	}
@@ -815,6 +833,12 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 		queue.add(new NetworkDBPointCost<T>(point, cost, reverse)); // we need to add new object to not  remove / rebalance priority queue
 		hctx.stats.addQueueTime += (System.nanoTime() - tm) / 1e6;
 		hctx.stats.addedVertices++;
+	}
+	
+	
+	private double smallestSegmentCost(HHRoutingContext<T> hctx, T st, T end) {
+		double dist = squareRootDist31(st.midX(), st.midY(), end.midX(), end.midY());
+		return dist / hctx.rctx.getRouter().getMaxSpeed();
 	}
 
 	private double distanceToEnd(HHRoutingContext<T> hctx, boolean reverse,  NetworkDBPoint nextPoint) {
@@ -868,10 +892,11 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 		hctx.rctx.config.PENALTY_FOR_REVERSE_DIRECTION = RoutingConfiguration.DEFAULT_PENALTY_FOR_REVERSE_DIRECTION * 4; 
 		hctx.rctx.config.initialDirection = start.getRoad().directionRoute(start.getSegmentStart(), start.isPositive());
 		hctx.rctx.config.targetDirection = end.getRoad().directionRoute(end.getSegmentEnd(), !end.isPositive());
-		
-		FinalRouteSegment f = planner.searchRouteInternal(hctx.rctx, start, end, null); // no diff at all: hctx.boundaries -> null 
+		hctx.rctx.config.MAX_VISITED = MAX_POINTS_CLUSTER_ROUTING;
+		FinalRouteSegment f = planner.searchRouteInternal(hctx.rctx, start, end, null); // no diff at all: hctx.boundaries -> null
+		hctx.rctx.config.MAX_VISITED = -1;
 		res.list = new RouteResultPreparation().convertFinalSegmentToResults(hctx.rctx, f);
-		res.rtTimeDetailed = f.distanceFromStart;
+		res.rtTimeDetailed = f == null ? 0 : f.distanceFromStart;
 		// clean up
 		hctx.rctx.config.initialDirection = null;
 		hctx.rctx.config.targetDirection = null;
@@ -956,7 +981,6 @@ public class HHRoutePlanner<T extends NetworkDBPoint> {
 				}
 			}
 		}
-		new RoutePlannerFrontEnd().makeStartEndPointsPrecise(route.detailed, start, end, new ArrayList<LatLon>()); 
 		return route;
 	}
 

@@ -42,8 +42,8 @@ public class DevicesSettingsCollection {
 			this.deviceType = device.getDeviceType();
 			this.enabled = deviceEnabled;
 			additionalParams.put(DeviceChangeableProperty.NAME, device.getName());
-			for(DeviceChangeableProperty property: device.getChangeableProperties()) {
-				additionalParams.put(property, null);
+			for(DeviceChangeableProperty property : device.getChangeableProperties()) {
+				additionalParams.put(property, property.getDefValue());
 			}
 		}
 
