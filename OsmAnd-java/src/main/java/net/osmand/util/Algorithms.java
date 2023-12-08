@@ -54,7 +54,7 @@ public class Algorithms {
 	public static boolean isEmpty(Collection<?> c) {
 		return c == null || c.size() == 0;
 	}
-	
+
 	private static final char[] CHARS_TO_NORMALIZE_KEY = {'’'};
 	private static final char[] CHARS_TO_NORMALIZE_VALUE = {'\''};
 
@@ -90,6 +90,7 @@ public class Algorithms {
 
 	/**
 	 * Split string by words and convert to lowercase, use as delimiter all chars except letters and digits
+	 *
 	 * @param str input string
 	 * @return result words list
 	 */
@@ -209,10 +210,10 @@ public class Algorithms {
 	}
 
 	/**
-	 * @see <a href="http://alienryderflex.com/polygon/">Determining Whether A Point Is Inside A Complex Polygon</a>
 	 * @param point
 	 * @param polygon
 	 * @return true if the point is in the area of the polygon
+	 * @see <a href="http://alienryderflex.com/polygon/">Determining Whether A Point Is Inside A Complex Polygon</a>
 	 */
 	public static boolean isPointInsidePolygon(LatLon point,
 	                                           List<LatLon> polygon) {
@@ -272,15 +273,15 @@ public class Algorithms {
 	}
 
 	public static String convertToPermittedFileName(String name) {
-		name = name.replace ("\"", "~");
-		name = name.replace ("*", "~");
-		name = name.replace ("/", "~");
-		name = name.replace (":", "~");
-		name = name.replace ("<", "~");
-		name = name.replace (">", "~");
-		name = name.replace ("?", "~");
-		name = name.replace ("\\", "~");
-		name = name.replace ("|", "~");
+		name = name.replace("\"", "~");
+		name = name.replace("*", "~");
+		name = name.replace("/", "~");
+		name = name.replace(":", "~");
+		name = name.replace("<", "~");
+		name = name.replace(">", "~");
+		name = name.replace("?", "~");
+		name = name.replace("\\", "~");
+		name = name.replace("|", "~");
 		return name;
 	}
 
@@ -322,35 +323,35 @@ public class Algorithms {
 		};
 	}
 
-    private static String simplifyFileName(String fn) {
-        String lc = fn.toLowerCase();
-        if (lc.contains(".")) {
-            lc = lc.substring(0, lc.indexOf("."));
-        }
-        if (lc.endsWith("_2")) {
-            lc = lc.substring(0, lc.length() - "_2".length());
-        }
-        boolean hasTimestampEnd = false;
-        for (int i = 0; i < lc.length(); i++) {
-            if (lc.charAt(i) >= '0' && lc.charAt(i) <= '9') {
-                hasTimestampEnd = true;
-                break;
-            }
-        }
-        if (!hasTimestampEnd) {
-            lc += "_00_00_00";
-        }
-        return lc;
-    }
+	private static String simplifyFileName(String fn) {
+		String lc = fn.toLowerCase();
+		if (lc.contains(".")) {
+			lc = lc.substring(0, lc.indexOf("."));
+		}
+		if (lc.endsWith("_2")) {
+			lc = lc.substring(0, lc.length() - "_2".length());
+		}
+		boolean hasTimestampEnd = false;
+		for (int i = 0; i < lc.length(); i++) {
+			if (lc.charAt(i) >= '0' && lc.charAt(i) <= '9') {
+				hasTimestampEnd = true;
+				break;
+			}
+		}
+		if (!hasTimestampEnd) {
+			lc += "_00_00_00";
+		}
+		return lc;
+	}
 
-    public static Comparator<String> getStringVersionComparator() {
-        return new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return -simplifyFileName(o1).compareTo(simplifyFileName(o2));
-            }
-        };
-    }
+	public static Comparator<String> getStringVersionComparator() {
+		return new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return -simplifyFileName(o1).compareTo(simplifyFileName(o2));
+			}
+		};
+	}
 
 	private static final char CHAR_TO_SPLIT = 0x01;
 
@@ -555,7 +556,7 @@ public class Algorithms {
 		return ((ch1 << 8) + ch2);
 	}
 
-	public static boolean startsWithAny(String s, String ... args) {
+	public static boolean startsWithAny(String s, String... args) {
 		if (!isEmpty(s) && args != null && args.length > 0) {
 			for (String arg : args) {
 				if (s.startsWith(arg)) {
@@ -566,7 +567,7 @@ public class Algorithms {
 		return false;
 	}
 
-	public static boolean containsAny(String s, String ... args) {
+	public static boolean containsAny(String s, String... args) {
 		if (!isEmpty(s) && args != null && args.length > 0) {
 			for (String arg : args) {
 				if (s.contains(arg)) {
@@ -577,7 +578,7 @@ public class Algorithms {
 		return false;
 	}
 
-	public static boolean endsWithAny(String s, String ... args) {
+	public static boolean endsWithAny(String s, String... args) {
 		if (!isEmpty(s) && args != null && args.length > 0) {
 			for (String arg : args) {
 				if (s.endsWith(arg)) {
@@ -588,7 +589,7 @@ public class Algorithms {
 		return false;
 	}
 
-	public static boolean equalsToAny(Object o, Object ... args) {
+	public static boolean equalsToAny(Object o, Object... args) {
 		if (o != null && args != null) {
 			for (Object o1 : args) {
 				if (o.equals(o1)) {
@@ -599,7 +600,7 @@ public class Algorithms {
 		return false;
 	}
 
-	public static boolean anyIsNull(Object ... args) {
+	public static boolean anyIsNull(Object... args) {
 		if (args != null) {
 			for (Object o : args) {
 				if (o == null) {
@@ -840,14 +841,14 @@ public class Algorithms {
 	public static StringBuilder readFromInputStream(InputStream i) throws IOException {
 		return readFromInputStream(i, true);
 	}
-	
+
 	public static byte[] readBytesFromInputStream(InputStream i) throws IOException {
 		ByteArrayOutputStream bous = new ByteArrayOutputStream();
 		streamCopy(i, bous);
 		i.close();
 		return bous.toByteArray();
 	}
-	
+
 	public static StringBuilder readFromInputStream(InputStream i, boolean autoclose) throws IOException {
 		StringBuilder responseBody = new StringBuilder();
 		responseBody.setLength(0);
@@ -878,7 +879,7 @@ public class Algorithms {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 	public static byte[] stringToGzip(String str) {
 		try {
 			ByteArrayOutputStream bous = new ByteArrayOutputStream();
@@ -1101,11 +1102,16 @@ public class Algorithms {
 		int X = (int) Math.floor(a);
 		int Y = (int) (Math.floor(255 * (a - X)));
 		switch (X) {
-			case 0: return 0xFFFF0000 + (Y << 8);
-			case 1: return 0xFF00FF00 + ((255 - Y) << 16);
-			case 2: return 0xFF00FF00 + Y;
-			case 3: return 0xFF0000FF + ((255 - Y) << 8);
-			case 4: return 0xFF0000FF + (Y << 16);
+			case 0:
+				return 0xFFFF0000 + (Y << 8);
+			case 1:
+				return 0xFF00FF00 + ((255 - Y) << 16);
+			case 2:
+				return 0xFF00FF00 + Y;
+			case 3:
+				return 0xFF0000FF + ((255 - Y) << 8);
+			case 4:
+				return 0xFF0000FF + (Y << 16);
 		}
 		return 0xFFFF00FF;
 	}
@@ -1113,27 +1119,27 @@ public class Algorithms {
 	public static int compare(int x, int y) {
 		return (x < y) ? -1 : ((x == y) ? 0 : 1);
 	}
-	
+
 	public static int compare(long x, long y) {
 		return (x < y) ? -1 : ((x == y) ? 0 : 1);
 	}
-	
+
 	public static int compare(String str1, String str2) {
 		return compare(str1, str2, false);
 	}
-	
+
 	public static int compare(String str1, String str2, boolean nullIsLess) {
-        if (str1 == str2) {
-            return 0;
-        }
-        if (str1 == null) {
-            return nullIsLess ? -1 : 1;
-        }
-        if (str2 == null) {
-            return nullIsLess ? 1 : - 1;
-        }
-        return str1.compareTo(str2);
-    }
+		if (str1 == str2) {
+			return 0;
+		}
+		if (str1 == null) {
+			return nullIsLess ? -1 : 1;
+		}
+		if (str2 == null) {
+			return nullIsLess ? 1 : -1;
+		}
+		return str1.compareTo(str2);
+	}
 
 	public static String getFileAsString(File file) {
 		try {
@@ -1201,7 +1207,7 @@ public class Algorithms {
 	public static long[] addToArrayL(long[] array, long value, boolean skipIfExists) {
 		long[] result;
 		if (array == null) {
-			result = new long[]{ value };
+			result = new long[] {value};
 		} else if (skipIfExists && Arrays.binarySearch(array, value) >= 0) {
 			result = array;
 		} else {
@@ -1364,7 +1370,7 @@ public class Algorithms {
 	}
 
 	@SafeVarargs
-	public static <T> List<T> asOneList(Collection<T> ... collections) {
+	public static <T> List<T> asOneList(Collection<T>... collections) {
 		List<T> result = new ArrayList<>();
 		for (Collection<T> collection : collections) {
 			result.addAll(collection);
@@ -1385,7 +1391,7 @@ public class Algorithms {
 		mapRect.top = Math.max(mapRect.top, gpxRect.top);
 		mapRect.bottom = mapRect.bottom == 0.0 ? gpxRect.bottom : Math.min(mapRect.bottom, gpxRect.bottom);
 	}
-	
+
 	public static long combine2Points(int x, int y) {
 		return (((long) x) << 32) | ((long) y);
 	}
@@ -1412,5 +1418,17 @@ public class Algorithms {
 		}
 		while (!checkNameCallback.processResult(newName));
 		return newName;
+	}
+
+	public static <T, E> boolean mapsEquals(HashMap<T, E> map1, HashMap<T, E> map2) {
+		if (map1.size() != map2.size()) {
+			return false;
+		}
+		for (T key : map1.keySet()) {
+			if (!map2.containsKey(key) || !Algorithms.objectEquals(map1.get(key), map2.get(key))) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

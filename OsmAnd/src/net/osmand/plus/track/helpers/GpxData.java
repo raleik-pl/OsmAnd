@@ -45,6 +45,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.osmand.PlatformUtil;
 import net.osmand.gpx.GPXFile;
 import net.osmand.gpx.GPXTrackAnalysis;
 import net.osmand.plus.routing.ColoringType;
@@ -56,10 +57,13 @@ import net.osmand.plus.track.helpers.GpsFilterHelper.SmoothingFilter;
 import net.osmand.plus.track.helpers.GpsFilterHelper.SpeedFilter;
 import net.osmand.util.Algorithms;
 
+import org.apache.commons.logging.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class GpxData {
+	public static final Log LOG = PlatformUtil.getLog(GpxData.class);
 
 	@Nullable
 	private GPXTrackAnalysis analysis;
@@ -85,6 +89,8 @@ public class GpxData {
 		if (parameter.isValidValue(value)) {
 			parameters.put(parameter, value);
 			return true;
+		} else {
+			LOG.info("invalid setValue " + parameter + "___" + value);
 		}
 		return false;
 	}
@@ -97,20 +103,20 @@ public class GpxData {
 	public void setAnalysis(@Nullable GPXTrackAnalysis analysis) {
 		this.analysis = analysis;
 		boolean hasAnalysis = analysis != null;
-		setValue(GPX_COL_TOTAL_DISTANCE, hasAnalysis ? analysis.totalDistance : null);
+		setValue(GPX_COL_TOTAL_DISTANCE, hasAnalysis ? (double) analysis.totalDistance : null);
 		setValue(GPX_COL_TOTAL_TRACKS, hasAnalysis ? analysis.totalTracks : null);
 		setValue(GPX_COL_START_TIME, hasAnalysis ? analysis.startTime : null);
 		setValue(GPX_COL_END_TIME, hasAnalysis ? analysis.endTime : null);
 		setValue(GPX_COL_TIME_SPAN, hasAnalysis ? analysis.timeSpan : null);
 		setValue(GPX_COL_TIME_MOVING, hasAnalysis ? analysis.timeMoving : null);
-		setValue(GPX_COL_TOTAL_DISTANCE_MOVING, hasAnalysis ? analysis.totalDistanceMoving : null);
+		setValue(GPX_COL_TOTAL_DISTANCE_MOVING, hasAnalysis ? (double) analysis.totalDistanceMoving : null);
 		setValue(GPX_COL_DIFF_ELEVATION_UP, hasAnalysis ? analysis.diffElevationUp : null);
 		setValue(GPX_COL_DIFF_ELEVATION_DOWN, hasAnalysis ? analysis.diffElevationDown : null);
 		setValue(GPX_COL_AVG_ELEVATION, hasAnalysis ? analysis.avgElevation : null);
 		setValue(GPX_COL_MIN_ELEVATION, hasAnalysis ? analysis.minElevation : null);
 		setValue(GPX_COL_MAX_ELEVATION, hasAnalysis ? analysis.maxElevation : null);
-		setValue(GPX_COL_MAX_SPEED, hasAnalysis ? analysis.maxSpeed : null);
-		setValue(GPX_COL_AVG_SPEED, hasAnalysis ? analysis.avgSpeed : null);
+		setValue(GPX_COL_MAX_SPEED, hasAnalysis ? (double) analysis.maxSpeed : null);
+		setValue(GPX_COL_AVG_SPEED, hasAnalysis ? (double) analysis.avgSpeed : null);
 		setValue(GPX_COL_POINTS, hasAnalysis ? analysis.points : null);
 		setValue(GPX_COL_WPT_POINTS, hasAnalysis ? analysis.wptPoints : null);
 		setValue(GPX_COL_WPT_CATEGORY_NAMES, hasAnalysis ? Algorithms.encodeCollection(analysis.wptCategoryNames) : null);

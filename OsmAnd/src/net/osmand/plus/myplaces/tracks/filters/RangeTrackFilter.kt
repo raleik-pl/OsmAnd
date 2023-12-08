@@ -121,7 +121,7 @@ open class RangeTrackFilter<T : Comparable<T>>(
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
 		val value = trackItem.dataItem?.gpxData?.getValue(filterType.propertyList[0]) ?: return false
 
-		if(trackItem.name.contains("zhzh")) {
+		if(trackItem.name.contains("Tue 08 Aug 2023_2")) {
 			CorwinLogger.log("sss")
 		}
 		val comparableValue = getComparableValue(value)
@@ -199,6 +199,11 @@ open class RangeTrackFilter<T : Comparable<T>>(
 				value.toString()
 			}
 		}
+	}
+
+	private fun getDisplayValue(value: T): Int {
+		val formattedValue = getFormattedValue(ceil(maxValue))
+		return formattedValue.valueSrc.toInt()
 	}
 
 	open fun getDisplayMaxValue(): Int {

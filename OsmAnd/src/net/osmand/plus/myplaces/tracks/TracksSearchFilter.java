@@ -258,6 +258,7 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_ALTITUDE, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.MAX_ALTITUDE, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.DATE_CREATION, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.OTHER, this));
 
 
 		long minDate = app.getGpxDbHelper().getTracksMinCreateDate();
