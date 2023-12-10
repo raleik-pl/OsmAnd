@@ -3,8 +3,8 @@ package net.osmand.plus.myplaces.tracks.filters
 import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.configmap.tracks.TrackItem
-import net.osmand.plus.track.helpers.GpxParameter
 import net.osmand.util.Algorithms
+import java.lang.IllegalArgumentException
 
 class OtherTrackFilter(
 	val app: OsmandApplication,
@@ -13,25 +13,40 @@ class OtherTrackFilter(
 	BaseTrackFilter(filterType, filterChangedListener) {
 
 	@Expose
-	var params = HashMap<GpxParameter, Boolean>()
+	var selectedParams = ArrayList<NonDbTrackParam>()
+
+	val parameters = ArrayList<NonDbTrackParam>()
 
 	init {
-		for (param in filterType.propertyList) {
-			params[param] = false
+		if(filterType.additionalData is List<*>) {
+			for (nameResId in filterType.additionalData) {
+				if(nameResId is NonDbTrackParam) {
+					parameters.add(nameResId)
+				} else {
+					throw IllegalArgumentException("$filterType's additionalParams should contain list of NonDbTrackParam elements")
+				}
+			}
 		}
 	}
 
 	override fun isEnabled(): Boolean {
-		for (value in params.values) {
-			if (value) {
-				return true
-			}
-		}
-		return false
+		return !Algorithms.isEmpty(selectedParams)
 	}
 
-	fun setItemSelected(param: GpxParameter, selected: Boolean) {
-		params[param] = selected
+	fun isParamSelected(param: NonDbTrackParam): Boolean {
+		return selectedParams.contains(param)
+	}
+
+	fun setItemSelected(param: NonDbTrackParam, selected: Boolean) {
+		val newList = ArrayList(selectedParams)
+		if (selected) {
+			if (!newList.contains(param)) {
+				newList.add(param)
+			}
+		} else {
+			newList.remove(param)
+		}
+		selectedParams = newList
 		filterChangedListener?.onFilterChanged()
 	}
 
@@ -49,12 +64,25 @@ class OtherTrackFilter(
 //			filterChangedListener?.onFilterChanged()
 //		}
 
+
+	private fun isTrackParamAccepted(trackItem: TrackItem, param: NonDbTrackParam): Boolean {
+		return when(param) {
+			NonDbTrackParam.VISIBLE_ON_MAP -> {
+				val selectedGpxHelper = app.selectedGpxHelper
+				selectedGpxHelper.getSelectedFileByPath(trackItem.path) != null
+
+			}
+			NonDbTrackParam.WITH_WAYPOINTS -> {
+				val wptPointsCount = trackItem.dataItem?.gpxData?.analysis?.wptPoints ?: 0
+				wptPointsCount != 0
+			}
+		}
+	}
+
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
-		for (parameter in params.keys){
-			if(params[parameter] == true) {
-				if(trackItem.dataItem?.gpxData?.getValue(parameter) == false) {
-					return false
-				}
+		for (parameter in selectedParams) {
+			if (!isTrackParamAccepted(trackItem, parameter)) {
+				return false
 			}
 		}
 //
@@ -74,25 +102,12 @@ class OtherTrackFilter(
 	}
 
 	fun getSelectedParamsCount(): Int {
-		var selectedCount = 0;
-		for (value in params.values){
-			if(value) {
-				selectedCount++
-			}
-		}
-//		if (isVisibleOnMap) selectedCount++
-//		if (hasWaypoints) selectedCount++
-		return selectedCount
+		return selectedParams.size
 	}
 
 	override fun initWithValue(value: BaseTrackFilter) {
 		if (value is OtherTrackFilter) {
-			for (parameter in params.keys){
-				params[parameter] = value.params[parameter]!!
-			}
-
-//			isVisibleOnMap = sourceFilter.isVisibleOnMap
-//			hasWaypoints = sourceFilter.hasWaypoints
+			selectedParams = ArrayList(value.selectedParams)
 			filterChangedListener?.onFilterChanged()
 		}
 	}
@@ -101,9 +116,8 @@ class OtherTrackFilter(
 		return super.equals(other) &&
 				other is OtherTrackFilter &&
 				other.filterType == filterType &&
-				Algorithms.mapsEquals(other.params, params)
-//				other.isVisibleOnMap == isVisibleOnMap &&
-//				other.hasWaypoints == hasWaypoints
+				selectedParams.size == other.selectedParams.size &&
+				selectedParams.containsAll(other.selectedParams)
 	}
 
 }

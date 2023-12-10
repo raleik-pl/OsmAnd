@@ -4,13 +4,48 @@ import android.graphics.drawable.Drawable
 import android.util.Pair
 import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
+import net.osmand.plus.configmap.tracks.TrackItem
+import net.osmand.plus.track.data.TrackFolder
 import net.osmand.util.Algorithms
+import java.lang.IllegalArgumentException
 
-abstract class ListTrackFilter(
+open class ListTrackFilter(
 	val app: OsmandApplication,
 	filterType: FilterType,
 	filterChangedListener: FilterChangedListener?) :
 	BaseTrackFilter(filterType, filterChangedListener) {
+
+	var collectionFilterParams: CollectionTrackFilterParams
+
+	init {
+		val additionalData = filterType.additionalData
+		if(additionalData == null || additionalData !is CollectionTrackFilterParams) {
+			throw IllegalArgumentException("additionalData in $filterType filter should be valid instance of CollectionTrackFilterParams")
+		}
+		collectionFilterParams = additionalData
+	}
+
+	var currentFolder: TrackFolder? = null
+		set(value) {
+			field = value
+			value?.let {
+				setSelectedItems(arrayListOf(it.getDirName()))
+			}
+		}
+
+	fun updateFullCollection(items: List<TrackItem>?) {
+		if (Algorithms.isEmpty(items)) {
+			allItemsCollection = HashMap()
+		} else {
+			val newCollection = HashMap<String, Int>()
+			for (item in items!!) {
+				val folderName = item.dataItem?.gpxData?.containingFolder ?: ""
+				val count = newCollection[folderName] ?: 0
+				newCollection[folderName] = count + 1
+			}
+			allItemsCollection = newCollection
+		}
+	}
 
 	override fun isEnabled(): Boolean {
 		return !Algorithms.isEmpty(selectedItems)
@@ -111,6 +146,50 @@ abstract class ListTrackFilter(
 		return false
 	}
 
-	var collectionFilterParams: CollectionTrackFilterParams? = null
+	fun addSelectedItems(selectedItems: List<String>) {
+		this.selectedItems.addAll(selectedItems)
+	}
+
+	fun clearSelectedItems() {
+		selectedItems = ArrayList()
+	}
+
+
+
+//	@Expose
+//	private var selectedCities = ArrayList<String>()
+
+	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
+		val trackItemPropertyValue = getTrackPropertyValue(trackItem)
+		for (item in selectedItems) {
+			if (Algorithms.stringsEqual(trackItemPropertyValue, item)) {
+				return true
+			}
+		}
+		return false
+	}
+
+	private fun getTrackPropertyValue(trackItem: TrackItem): String {
+		val value = trackItem.dataItem?.gpxData?.getValue(filterType.propertyList[0])
+		return if(value != null) value as String else ""
+	}
+
+	override fun equals(other: Any?): Boolean {
+		return super.equals(other) &&
+				other is ListTrackFilter &&
+				other.selectedItems.size == selectedItems.size &&
+				areAllItemsSelected(other.selectedItems)
+	}
+
+//	override fun initWithValue(value: BaseTrackFilter) {
+//		if(value is CityTrackFilter) {
+//			if(!Algorithms.isEmpty(value.selectedCities) || Algorithms.isEmpty(value.selectedItems)){
+//				value.setSelectedItems(ArrayList(value.selectedCities))
+//			}
+//		}
+//		super.initWithValue(value)
+//	}
+
+
 
 }

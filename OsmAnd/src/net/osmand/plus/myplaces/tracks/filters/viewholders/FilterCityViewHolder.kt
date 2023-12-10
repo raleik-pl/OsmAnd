@@ -23,7 +23,7 @@ class FilterCityViewHolder(var app: OsmandApplication, itemView: View, nightMode
 	private val titleContainer: View
 	private val divider: View
 	private val explicitIndicator: ImageView
-	private var filter: ListTrackFilter? = null
+	private lateinit var filter: ListTrackFilter
 
 	private val filterPropertiesClosed = object : DialogClosedListener {
 		override fun onDialogClosed() {
@@ -63,14 +63,18 @@ class FilterCityViewHolder(var app: OsmandApplication, itemView: View, nightMode
 	}
 
 	private fun updateValues() {
-		filter?.let {
-			adapter.items = ArrayList(it.allItems)
+			adapter.items = ArrayList(filter.allItems)
+			val trackFolder = filter.currentFolder
+			trackFolder?.let { currentTrackFolder ->
+				val currentFolderName = currentTrackFolder.getDirName()
+				adapter.items.remove(currentFolderName)
+				adapter.items.add(0, currentFolderName)
+			}
 			recycler.adapter = adapter
 			recycler.layoutManager = LinearLayoutManager(app)
 			recycler.itemAnimator = null
-			selectedValue.text = "${it.selectedItems.size}"
-			AndroidUiHelper.updateVisibility(selectedValue, it.selectedItems.size > 0)
-		}
+			selectedValue.text = "${filter.selectedItems.size}"
+			AndroidUiHelper.updateVisibility(selectedValue, filter.selectedItems.size > 0)
 	}
 
 }

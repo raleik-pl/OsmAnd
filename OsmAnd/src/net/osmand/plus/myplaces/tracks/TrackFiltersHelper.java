@@ -7,6 +7,7 @@ import net.osmand.plus.myplaces.tracks.filters.BaseTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.DateCreationTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.FilterChangedListener;
 import net.osmand.plus.myplaces.tracks.filters.FilterType;
+import net.osmand.plus.myplaces.tracks.filters.ListTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.OtherTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.RangeTrackFilter;
 import net.osmand.plus.myplaces.tracks.filters.TrackNameFilter;
@@ -26,6 +27,10 @@ public class TrackFiltersHelper {
 
 	public static BaseTrackFilter createOtherFilter(OsmandApplication app, FilterType filterType, FilterChangedListener listener) {
 		return new OtherTrackFilter(app, filterType, listener);
+	}
+
+	public static BaseTrackFilter createSingleListFilter(OsmandApplication app, FilterType filterType, FilterChangedListener listener) {
+		return new ListTrackFilter(app, filterType, listener);
 	}
 
 	public static BaseTrackFilter createRangeFilter(OsmandApplication app, FilterType filterType, FilterChangedListener listener) {
@@ -78,7 +83,12 @@ public class TrackFiltersHelper {
 			}
 
 			case MULTI_FIELD_LIST: {
-				newFilter = createDateFilter(filterType, (new Date()).getTime(), filterChangedListener);
+				newFilter = createOtherFilter(app, filterType, filterChangedListener);
+				break;
+			}
+
+			case SINGLE_FIELD_LIST: {
+				newFilter = createSingleListFilter(app, filterType, filterChangedListener);
 				break;
 			}
 

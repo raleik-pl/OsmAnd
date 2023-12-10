@@ -2,23 +2,27 @@ package net.osmand.plus.myplaces.tracks.filters;
 
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public interface CollectionTrackFilterParams {
-	default boolean hasSelectAllVariant() {
+import net.osmand.plus.OsmandApplication;
+
+public class CollectionTrackFilterParams {
+	boolean hasSelectAllVariant() {
 		return false;
 	}
-	default String getItemText(String itemName){
+
+	String getItemText(OsmandApplication app, String itemName) {
 		return itemName;
 	}
 
 	@Nullable
-	default Drawable getItemIcon(String itemName )  {
+	Drawable getItemIcon(OsmandApplication app, String itemName) {
 		return null;
 	}
 
 	@Nullable
-	default Drawable getSelectAllItemIcon(boolean isChecked, boolean nightMode) {
+	Drawable getSelectAllItemIcon(OsmandApplication app, boolean isChecked, boolean nightMode) {
 		return null;
 	}
 

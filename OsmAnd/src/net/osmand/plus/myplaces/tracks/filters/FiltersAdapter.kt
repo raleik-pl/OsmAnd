@@ -56,7 +56,7 @@ class FiltersAdapter(
 			}
 
 			FilterDisplayType.MULTI_FIELD_LIST -> {
-				val view = inflater.inflate(R.layout.filter_other_item, parent, false)
+				val view = inflater.inflate(R.layout.filter_single_field_list_item, parent, false)
 				FilterOtherViewHolder(view, nightMode)
 			}
 
@@ -80,10 +80,17 @@ class FiltersAdapter(
 						item.value = newText
 					}
 				})
-//		} else if (holder is FilterDurationViewHolder) {
-//			holder.bindView(item as RangeTrackFilter<*>)
 		} else if (holder is FilterRangeViewHolder) {
 			holder.bindView(item as RangeTrackFilter<*>)
+		} else if (holder is FilterDateViewHolder) {
+			holder.bindView(item as DateCreationTrackFilter, activity)
+		} else if (holder is FilterCityViewHolder) {
+			holder.bindView(item as ListTrackFilter, fragmentManager)
+		} else if (holder is FilterOtherViewHolder) {
+			holder.bindView(item as OtherTrackFilter)
+
+		//		} else if (holder is FilterDurationViewHolder) {
+//			holder.bindView(item as RangeTrackFilter<*>)
 //			if (item.filterType == FilterType.TIME_IN_MOTION) {
 //				holder.bindView(item as TimeInMotionTrackFilter)
 //			} else if (item.filterType == FilterType.LENGTH) {
@@ -101,8 +108,6 @@ class FiltersAdapter(
 //			} else if (item.filterType == FilterType.DOWNHILL) {
 //				holder.bindView(item as DownhillTrackFilter)
 //			}
-		} else if (holder is FilterDateViewHolder) {
-			holder.bindView(item as DateCreationTrackFilter, activity)
 //		} else if (holder is FilterCityViewHolder) {
 //			holder.bindView(item as CityTrackFilter, fragmentManager)
 //		} else if (holder is FilterColorViewHolder) {
@@ -126,7 +131,7 @@ class FiltersAdapter(
 
 	fun onTracksFilteringComplete() {
 		for (i in 0 until items.size) {
-			if (items[i].updateOnOtherFiltersChangeNeeded()) {
+			if (items[i].filterType.updateOnOtherFiltersChangeNeeded) {
 				notifyItemChanged(i)
 			}
 		}

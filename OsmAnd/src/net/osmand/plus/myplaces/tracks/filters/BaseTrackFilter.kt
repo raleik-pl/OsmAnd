@@ -168,9 +168,9 @@ abstract class BaseTrackFilter(
 		return other is BaseTrackFilter && other.filterType == filterType
 	}
 
-	open fun updateOnOtherFiltersChangeNeeded(): Boolean {
-		return false
-	}
+//	open fun updateOnOtherFiltersChangeNeeded(): Boolean {
+//		return false
+//	}
 
 //	fun clone(): BaseTrackFilter {
 //		val newFilter = BaseTrackFilter(

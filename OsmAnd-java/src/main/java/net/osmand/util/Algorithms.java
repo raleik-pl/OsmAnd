@@ -1420,15 +1420,5 @@ public class Algorithms {
 		return newName;
 	}
 
-	public static <T, E> boolean mapsEquals(HashMap<T, E> map1, HashMap<T, E> map2) {
-		if (map1.size() != map2.size()) {
-			return false;
-		}
-		for (T key : map1.keySet()) {
-			if (!map2.containsKey(key) || !Algorithms.objectEquals(map1.get(key), map2.get(key))) {
-				return false;
-			}
-		}
-		return true;
-	}
+
 }
