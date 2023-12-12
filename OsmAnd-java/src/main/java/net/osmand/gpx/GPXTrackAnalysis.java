@@ -47,6 +47,11 @@ public class GPXTrackAnalysis {
 	public float maxSpeed = 0;
 	public float avgSpeed;
 
+	public float minSensorSpeed = Float.MAX_VALUE;
+	public float maxSensorSpeed = 0;
+	public float avgSensorSpeed;
+
+
 	public double minHdop = Double.NaN;
 	public double maxHdop = Double.NaN;
 
@@ -150,6 +155,9 @@ public class GPXTrackAnalysis {
 		long timeDiffMillis = 0;
 		int timeDiff = 0;
 		double totalSpeedSum = 0;
+
+		int sensorSpeedCount = 0;
+		double totalSensorSpeedSum = 0;
 		points = 0;
 
 		pointAttributes = new ArrayList<>();
@@ -283,12 +291,16 @@ public class GPXTrackAnalysis {
 				attribute.speed = speed;
 				attribute.elevation = elevation;
 				addWptAttribute(point, attribute, pointsAnalyser);
+				if (attribute.sensorSpeed > 0) {
+					sensorSpeedCount++;
+					totalSensorSpeedSum += attribute.sensorSpeed;
+				}
 			}
 			processElevationDiff(s);
 		}
 		checkUnspecifiedValues(fileTimeStamp);
 		processAverageValues(totalElevation, elevationPoints, totalSpeedSum, speedCount);
-
+		processAverageSensorSpeed(totalSensorSpeedSum, sensorSpeedCount);
 		return this;
 	}
 
@@ -358,6 +370,14 @@ public class GPXTrackAnalysis {
 			}
 		} else {
 			avgSpeed = -1;
+		}
+	}
+
+	private void processAverageSensorSpeed(double totalSensorSpeedSum, int sensorSpeedCount) {
+		if (sensorSpeedCount > 0) {
+			avgSensorSpeed = (float) totalSensorSpeedSum / (float) sensorSpeedCount;
+		} else {
+			avgSensorSpeed = -1;
 		}
 	}
 

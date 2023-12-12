@@ -2,6 +2,7 @@ package net.osmand.plus.track.helpers;
 
 import static net.osmand.IndexConstants.GPX_INDEX_DIR;
 import static net.osmand.plus.track.helpers.GpxParameter.*;
+import static net.osmand.plus.track.helpers.GpxParameter.AVG_SENSOR_SPEED;
 
 import android.util.Pair;
 
@@ -34,7 +35,7 @@ public class GPXDatabase {
 
 	public static final Log LOG = PlatformUtil.getLog(GPXDatabase.class);
 
-	private static final int DB_VERSION = 16;
+	private static final int DB_VERSION = 17;
 	private static final String DB_NAME = "gpx_database";
 
 	protected static final String GPX_TABLE_NAME = "gpxTable";
@@ -211,6 +212,9 @@ public class GPXDatabase {
 		analysis.minSpeed = (float) query.getDouble(MAX_SPEED.getSelectColumnIndex());
 		analysis.maxSpeed = (float) query.getDouble(MAX_SPEED.getSelectColumnIndex());
 		analysis.avgSpeed = (float) query.getDouble(AVG_SPEED.getSelectColumnIndex());
+		analysis.minSpeed = (float) query.getDouble(MAX_SENSOR_SPEED.getSelectColumnIndex());
+		analysis.maxSpeed = (float) query.getDouble(MAX_SENSOR_SPEED.getSelectColumnIndex());
+		analysis.avgSpeed = (float) query.getDouble(AVG_SENSOR_SPEED.getSelectColumnIndex());
 		analysis.points = query.getInt(POINTS.getSelectColumnIndex());
 		analysis.wptPoints = query.getInt(WPT_POINTS.getSelectColumnIndex());
 

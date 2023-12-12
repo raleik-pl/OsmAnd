@@ -47,7 +47,11 @@ public enum GpxParameter {
 	MAX_FILTER_HDOP("maxFilterHdop", "double", Double.class, Double.NaN),
 	START_LAT("startLat", "double", String.class, null),
 	START_LON("startLon", "double", String.class, null),
-	NEAREST_CITY_NAME("nearestCityName", "TEXT", String.class, null);
+	NEAREST_CITY_NAME("nearestCityName", "TEXT", String.class, null),
+	MIN_SENSOR_SPEED("minSensorSpeed", "double", Double.class, 0d),
+	MAX_SENSOR_SPEED("maxSensorSpeed", "double", Double.class, 0d),
+	AVG_SENSOR_SPEED("avgSensorSpeed", "double", Double.class, 0d)
+	;
 
 
 	@NonNull

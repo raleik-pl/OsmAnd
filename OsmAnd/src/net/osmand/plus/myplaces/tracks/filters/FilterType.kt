@@ -51,6 +51,13 @@ enum class FilterType(
 		MeasureUnitType.SPEED,
 		listOf(0.0, TrackFiltersConstants.SPEED_MAX_VALUE.toDouble()),
 		false),
+	AVERAGE_SENSOR_SPEED(
+		R.string.avg_sensor_speed,
+		FilterDisplayType.RANGE,
+		Collections.singletonList(GpxParameter.AVG_SENSOR_SPEED),
+		MeasureUnitType.SPEED,
+		listOf(0.0, TrackFiltersConstants.SPEED_MAX_VALUE.toDouble()),
+		false),
 	MAX_SPEED(
 		R.string.max_speed,
 		FilterDisplayType.RANGE,

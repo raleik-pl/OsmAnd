@@ -243,6 +243,7 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 		List<BaseTrackFilter> newFiltersFilters = new ArrayList<>();
 //		currentFilters.clear();
 		LOG.debug("recreateFilters");
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_SENSOR_SPEED, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.NAME, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.DURATION, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.TIME_IN_MOTION, this));

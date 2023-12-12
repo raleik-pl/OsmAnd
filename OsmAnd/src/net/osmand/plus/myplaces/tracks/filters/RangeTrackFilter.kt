@@ -50,52 +50,43 @@ open class RangeTrackFilter<T : Comparable<T>>(
 		}
 	}
 
-//	private fun max(value1: T, value2: T): T {
-//		return if(getComparableValue(value1) >= value2) {
-//			value1
-//		} else {
-//			value2
-//		}
-//		val propertyType = filterType.propertyList[0].typeClass
-//		return when (propertyType){
-//			java.lang.Double::class.java -> {
-//				maxOf(value1 as Double, value2 as Double) as T
-//			}
-//
-//			java.lang.Float::class.java -> {
-//				maxOf(value1 as Float, value2 as Float) as T
-//			}
-//
-//			java.lang.Integer::class.java -> {
-//				maxOf(value1 as Int, value2 as Int) as T
-//			}
-//
-//			java.lang.Long::class.java -> {
-//				maxOf(value1 as Long, value2 as Long) as T
-//			}
-//			else -> {
-//				throw IllegalArgumentException("Unsupported type $propertyType for max")
-//			}
-//		}
-//	}
-
-
 	fun setValueTo(to: String, updateListeners: Boolean = true) {
+		val baseValue = getBaseValueFromFormatted(to)
 		when (filterType.propertyList[0].typeClass) {
 			java.lang.Double::class.java -> {
-				setValueTo(to.toDouble() as java.lang.Double, updateListeners)
+				setValueTo(baseValue.toDouble() as java.lang.Double, updateListeners)
 			}
 
 			java.lang.Float::class.java -> {
-				setValueTo(to.toFloat() as java.lang.Float, updateListeners)
+				setValueTo(baseValue as java.lang.Float, updateListeners)
 			}
 
 			java.lang.Integer::class.java -> {
-				setValueTo(to.toInt() as java.lang.Integer, updateListeners)
+				setValueTo(baseValue.toInt() as java.lang.Integer, updateListeners)
 			}
 
 			java.lang.Long::class.java -> {
-				setValueTo(to.toLong() as java.lang.Long, updateListeners)
+				setValueTo(baseValue.toLong() as java.lang.Long, updateListeners)
+			}
+		}
+	}
+	fun setValueFrom(from: String, updateListeners: Boolean = true) {
+		val baseValue = getBaseValueFromFormatted(from)
+		when (filterType.propertyList[0].typeClass) {
+			java.lang.Double::class.java -> {
+				setValueFrom(baseValue.toDouble() as java.lang.Double, updateListeners)
+			}
+
+			java.lang.Float::class.java -> {
+				setValueFrom(baseValue as java.lang.Float, updateListeners)
+			}
+
+			java.lang.Integer::class.java -> {
+				setValueFrom(baseValue.toInt() as java.lang.Integer, updateListeners)
+			}
+
+			java.lang.Long::class.java -> {
+				setValueFrom(baseValue.toLong() as java.lang.Long, updateListeners)
 			}
 		}
 	}
@@ -118,10 +109,9 @@ open class RangeTrackFilter<T : Comparable<T>>(
 	}
 
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
-		val value = trackItem.dataItem?.getParameter<String>(filterType.propertyList[0])
-		if (value == null) {
-			return false
-		}
+		val value =
+			(filterType.propertyList[0].typeClass.cast(trackItem.dataItem?.getParameter(filterType.propertyList[0])))
+				?: return false
 
 		if (trackItem.name.contains("Tue 08 Aug 2023_2")) {
 			CorwinLogger.log("sss")
@@ -214,13 +204,36 @@ open class RangeTrackFilter<T : Comparable<T>>(
 	}
 
 	open fun getDisplayValueFrom(): Int {
-		val formattedValue = getFormattedValue(flor(valueFrom))
+		val formattedValue = getFormattedValue(valueFrom.toString())
 		return formattedValue.valueSrc.toInt()
 	}
 
 	open fun getDisplayValueTo(): Int {
-		val formattedValue = getFormattedValue(ceil(valueTo))
+		val formattedValue = getFormattedValue(valueTo.toString())
 		return formattedValue.valueSrc.toInt()
+	}
+
+	fun getBaseValueFromFormatted(value: String): Float {
+		val metricsConstants: MetricsConstants = app.settings.METRIC_SYSTEM.get()
+		val mode = app.settings.applicationMode
+		val speedConstant = app.settings.SPEED_SYSTEM.getModeValue(mode)
+		return when (filterType.measureUnitType) {
+			MeasureUnitType.SPEED -> OsmAndFormatter.getBaseValueFromFormattedSpeed(
+				value.toFloat(),
+				app,
+				speedConstant)
+
+			MeasureUnitType.ALTITUDE -> OsmAndFormatter.getMetersFromFormattedAltitudeValue(
+				value.toFloat(),
+				metricsConstants)
+
+			MeasureUnitType.DISTANCE -> OsmAndFormatter.getMetersFromFormattedDistanceValue(
+				value.toFloat(),
+				metricsConstants)
+
+			else -> value.toFloat()
+		}
+
 	}
 
 	private fun getFormattedValue(value: String): FormattedValue {
@@ -283,15 +296,19 @@ open class RangeTrackFilter<T : Comparable<T>>(
 			java.lang.Integer::class.java -> {
 				check(value.toInt()) as T
 			}
+
 			java.lang.Double::class.java -> {
 				check(value.toDouble()) as T
 			}
+
 			java.lang.Long::class.java -> {
 				check(value.toLong()) as T
 			}
+
 			java.lang.Float::class.java -> {
 				check(value.toFloat()) as T
 			}
+
 			else -> {
 				throw IllegalArgumentException("Can not cast $value to $clazz")
 			}

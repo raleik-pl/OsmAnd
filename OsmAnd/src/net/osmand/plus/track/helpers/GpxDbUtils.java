@@ -4,6 +4,7 @@ import static net.osmand.IndexConstants.GPX_INDEX_DIR;
 import static net.osmand.plus.track.helpers.GPXDatabase.GPX_TABLE_NAME;
 import static net.osmand.plus.track.helpers.GPXDatabase.GPX_UPDATE_PARAMETERS_START;
 import static net.osmand.plus.track.helpers.GpxParameter.*;
+import static net.osmand.plus.track.helpers.GpxParameter.AVG_SENSOR_SPEED;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -175,6 +176,11 @@ public class GpxDbUtils {
 		if (oldVersion < 16) {
 			addTableColumn(db, FILE_CREATION_TIME);
 		}
+		if (oldVersion < 17) {
+			addTableColumn(db, MIN_SENSOR_SPEED);
+			addTableColumn(db, MAX_SENSOR_SPEED);
+			addTableColumn(db, AVG_SENSOR_SPEED);
+		}
 		db.execSQL(getIndexQuery());
 	}
 
@@ -260,6 +266,8 @@ public class GpxDbUtils {
 		map.put(MAX_ELEVATION, hasAnalysis ? analysis.maxElevation : null);
 		map.put(MAX_SPEED, hasAnalysis ? analysis.maxSpeed : null);
 		map.put(AVG_SPEED, hasAnalysis ? analysis.avgSpeed : null);
+		map.put(MAX_SENSOR_SPEED, hasAnalysis ? analysis.maxSensorSpeed : null);
+		map.put(AVG_SENSOR_SPEED, hasAnalysis ? analysis.avgSensorSpeed : null);
 		map.put(POINTS, hasAnalysis ? analysis.points : null);
 		map.put(WPT_POINTS, hasAnalysis ? analysis.wptPoints : null);
 		map.put(WPT_CATEGORY_NAMES, hasAnalysis ? Algorithms.encodeCollection(analysis.wptCategoryNames) : null);

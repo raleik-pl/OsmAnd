@@ -77,7 +77,7 @@ open class FilterRangeViewHolder(
 			override fun onStopTrackingTouch(slider: RangeSlider) {
 				isSliderDragging = false
 				val values = slider.values
-				filter.setValueFrom(Math.round(values[0]))
+				filter.setValueFrom(Math.round(values[0]).toString())
 				filter.setValueTo(Math.round(values[1]).toString())
 				updateValues()
 			}
@@ -114,7 +114,7 @@ open class FilterRangeViewHolder(
 						&& filter.valueTo is Number
 						&& newValue < (filter.valueTo as Number).toInt()
 						&& !isSliderDragging) {
-						filter.setValueFrom(newValue.toFloat())
+						filter.setValueFrom(newValue.toString())
 						updateValues()
 					}
 				}
