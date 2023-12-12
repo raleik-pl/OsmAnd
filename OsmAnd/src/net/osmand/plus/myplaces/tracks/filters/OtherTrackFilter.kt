@@ -3,6 +3,7 @@ package net.osmand.plus.myplaces.tracks.filters
 import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.configmap.tracks.TrackItem
+import net.osmand.plus.track.helpers.GpxParameter
 import net.osmand.util.Algorithms
 import java.lang.IllegalArgumentException
 
@@ -73,7 +74,7 @@ class OtherTrackFilter(
 
 			}
 			NonDbTrackParam.WITH_WAYPOINTS -> {
-				val wptPointsCount = trackItem.dataItem?.gpxData?.analysis?.wptPoints ?: 0
+				val wptPointsCount = trackItem.dataItem?.getParameter(GpxParameter.WPT_POINTS) ?: 0
 				wptPointsCount != 0
 			}
 		}

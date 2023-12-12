@@ -256,7 +256,7 @@ public class MapViewTrackingUtilities implements OsmAndLocationListener, IMapLoc
 				}
 				registerUnregisterSensor(location, smallSpeedForCompass);
 
-				if (mapRenderer != null) {
+				if (mapRenderer != null && !settings.USE_V1_AUTO_ZOOM.get()) {
 					setMyLocationV2(mapView, mapRenderer, location, movingTime, rotation);
 				} else {
 					setMyLocationV1(mapView, location, movingTime, rotation, pendingRotation);
@@ -374,11 +374,15 @@ public class MapViewTrackingUtilities implements OsmAndLocationListener, IMapLoc
 	}
 
 	public void updateSettings() {
+		updateSettings(true);
+	}
+
+	private void updateSettings(boolean updateRotationByCompass) {
 		if (isMapLinkedToLocation) {
 			mapDisplayPositionManager.updateMapDisplayPosition();
 		}
 		registerUnregisterSensor(app.getLocationProvider().getLastKnownLocation(), false);
-		if (mapView != null) {
+		if (mapView != null && updateRotationByCompass) {
 			mapView.initMapRotationByCompassMode();
 		}
 	}
@@ -503,7 +507,7 @@ public class MapViewTrackingUtilities implements OsmAndLocationListener, IMapLoc
 				backToLocationWithDelay(autoFollow);
 			}
 		} else {
-			updateSettings();
+			updateSettings(false);
 		}
 	}
 

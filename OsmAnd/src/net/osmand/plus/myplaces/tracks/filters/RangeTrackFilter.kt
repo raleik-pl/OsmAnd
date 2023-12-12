@@ -1,7 +1,6 @@
 package net.osmand.plus.myplaces.tracks.filters
 
 import com.google.gson.annotations.Expose
-import com.google.gson.reflect.TypeToken
 import net.osmand.CorwinLogger
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.configmap.tracks.TrackItem
@@ -119,9 +118,12 @@ open class RangeTrackFilter<T : Comparable<T>>(
 	}
 
 	override fun isTrackAccepted(trackItem: TrackItem): Boolean {
-		val value = trackItem.dataItem?.gpxData?.getValue(filterType.propertyList[0]) ?: return false
+		val value = trackItem.dataItem?.getParameter<String>(filterType.propertyList[0])
+		if (value == null) {
+			return false
+		}
 
-		if(trackItem.name.contains("Tue 08 Aug 2023_2")) {
+		if (trackItem.name.contains("Tue 08 Aug 2023_2")) {
 			CorwinLogger.log("sss")
 		}
 		val comparableValue = getComparableValue(value)
@@ -245,7 +247,7 @@ open class RangeTrackFilter<T : Comparable<T>>(
 	}
 
 	private fun getComparableValue(value: Any): T {
-		if(value is Number) {
+		if (value is Number) {
 			return if (getProperty().typeClass == java.lang.Integer::class.java) {
 				check(value.toInt()) as T
 			} else if (getProperty().typeClass == java.lang.Double::class.java) {
@@ -261,18 +263,38 @@ open class RangeTrackFilter<T : Comparable<T>>(
 		throw IllegalArgumentException("$value is not a number")
 	}
 
+//	inline fun <reified T> getComparableValue(value: String): T {
+//		return if (T::class.java == java.lang.Integer::class.java) {
+//			value.toInt() as T
+//		} else if (T::class.java == java.lang.Double::class.java) {
+//			value.toDouble() as T
+//		} else if (T::class.java == java.lang.Long::class.java) {
+//			value.toLong() as T
+//		} else if (T::class.java == java.lang.Float::class.java) {
+//			value.toFloat() as T
+//		} else {
+//			throw IllegalArgumentException("Can not cast $value to " + T::class.java)
+//		}
+//	}
 
-	inline fun <reified T> getComparableValue(value: String): T {
-		return if (T::class.java == java.lang.Integer::class.java) {
-			value.toInt() as T
-		} else if (T::class.java == java.lang.Double::class.java) {
-			value.toDouble() as T
-		} else if (T::class.java == java.lang.Long::class.java) {
-			value.toLong() as T
-		} else if (T::class.java == java.lang.Float::class.java) {
-			value.toFloat() as T
-		} else {
-			throw IllegalArgumentException("Can not cast $value to " + T::class.java)
+
+	fun getComparableValue(value: String): T {
+		return when (val clazz = filterType.propertyList[0].typeClass) {
+			java.lang.Integer::class.java -> {
+				check(value.toInt()) as T
+			}
+			java.lang.Double::class.java -> {
+				check(value.toDouble()) as T
+			}
+			java.lang.Long::class.java -> {
+				check(value.toLong()) as T
+			}
+			java.lang.Float::class.java -> {
+				check(value.toFloat()) as T
+			}
+			else -> {
+				throw IllegalArgumentException("Can not cast $value to $clazz")
+			}
 		}
 	}
 //

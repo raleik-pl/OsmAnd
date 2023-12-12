@@ -1305,11 +1305,6 @@ public class OsmandSettings {
 
 	public final CommonPreference<Float> MAP_DENSITY = new FloatPreference(this, "map_density_n", 1f).makeProfile().cache();
 
-	{
-		MAP_DENSITY.setModeDefaultValue(ApplicationMode.CAR, 1.5f);
-	}
-
-
 	public final OsmandPreference<Boolean> SHOW_POI_LABEL = new BooleanPreference(this, "show_poi_label", false).makeProfile();
 
 	public final OsmandPreference<Boolean> ONLINE_PHOTOS_ROW_COLLAPSED = new BooleanPreference(this, "mapillary_menu_collapsed", true).makeGlobal().makeShared();
@@ -1742,12 +1737,6 @@ public class OsmandSettings {
 		ROTATE_MAP.set(compassMode.getValue());
 	}
 
-	public static final int CENTER_CONSTANT = 0;
-	public static final int BOTTOM_CONSTANT = 1;
-	public static final int MIDDLE_BOTTOM_CONSTANT = 2;
-	public static final int MIDDLE_TOP_CONSTANT = 3;
-	public static final int LANDSCAPE_MIDDLE_RIGHT_CONSTANT = 4;
-
 	public static final int POSITION_PLACEMENT_AUTOMATIC = 0;
 	public static final int POSITION_PLACEMENT_CENTER = 1;
 	public static final int POSITION_PLACEMENT_BOTTOM = 2;
@@ -1828,6 +1817,7 @@ public class OsmandSettings {
 
 	public final OsmandPreference<Boolean> SHOULD_SHOW_FREE_VERSION_BANNER = new BooleanPreference(this, "should_show_free_version_banner", false).makeGlobal().makeShared().cache();
 	public final OsmandPreference<Boolean> USE_HH_ROUTING = new BooleanPreference(this, "use_hh_routing", false).makeGlobal().makeShared().cache();
+	public final OsmandPreference<Boolean> USE_V1_AUTO_ZOOM = new BooleanPreference(this, "use_v1_auto_zoom", false).makeGlobal().makeShared().cache();
 	public final OsmandPreference<Boolean> TRANSPARENT_STATUS_BAR = new BooleanPreference(this, "transparent_status_bar", true).makeGlobal().makeShared();
 
 	public final OsmandPreference<Boolean> SHOW_INFO_ABOUT_PRESSED_KEY = new BooleanPreference(this, "show_info_about_pressed_key", false).makeGlobal().makeShared();
@@ -3116,9 +3106,6 @@ public class OsmandSettings {
 
 	public final OsmandPreference<Boolean> SHOW_RELATIVE_BEARING_OTHERWISE_REGULAR_BEARING =
 			new BooleanPreference(this, "show_relative_bearing", true).makeProfile();
-
-	public final OsmandPreference<Boolean> APPROXIMATE_BEARING =
-			new BooleanPreference(this, "calculate_bearing", false).makeProfile();
 
 	public final OsmandPreference<Long> AGPS_DATA_LAST_TIME_DOWNLOADED =
 			new LongPreference(this, "agps_data_downloaded", 0).makeGlobal();

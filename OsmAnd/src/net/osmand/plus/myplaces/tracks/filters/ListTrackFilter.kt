@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import net.osmand.plus.OsmandApplication
 import net.osmand.plus.configmap.tracks.TrackItem
 import net.osmand.plus.track.data.TrackFolder
+import net.osmand.plus.track.helpers.GpxParameter
 import net.osmand.util.Algorithms
 import java.lang.IllegalArgumentException
 
@@ -39,7 +40,7 @@ open class ListTrackFilter(
 		} else {
 			val newCollection = HashMap<String, Int>()
 			for (item in items!!) {
-				val folderName = item.dataItem?.gpxData?.containingFolder ?: ""
+				val folderName = item.dataItem?.getParameter(GpxParameter.FILE_DIR) ?: ""
 				val count = newCollection[folderName] ?: 0
 				newCollection[folderName] = count + 1
 			}
@@ -170,8 +171,7 @@ open class ListTrackFilter(
 	}
 
 	private fun getTrackPropertyValue(trackItem: TrackItem): String {
-		val value = trackItem.dataItem?.gpxData?.getValue(filterType.propertyList[0])
-		return if(value != null) value as String else ""
+		return trackItem.dataItem?.getParameter(filterType.propertyList[0]) ?: ""
 	}
 
 	override fun equals(other: Any?): Boolean {

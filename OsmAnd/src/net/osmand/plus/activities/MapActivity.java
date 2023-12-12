@@ -74,6 +74,7 @@ import net.osmand.plus.helpers.IntentHelper;
 import net.osmand.plus.helpers.LockHelper;
 import net.osmand.plus.helpers.LockHelper.LockUIAdapter;
 import net.osmand.plus.helpers.MapAppInitializeListener;
+import net.osmand.plus.helpers.MapDisplayPositionManager;
 import net.osmand.plus.helpers.MapFragmentsHelper;
 import net.osmand.plus.helpers.MapPermissionsResultCallback;
 import net.osmand.plus.helpers.MapRouteCalculationProgressListener;
@@ -698,7 +699,7 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 			disableDrawer();
 		}
 
-		if (showWelcomeScreen && FirstUsageWizardFragment.showFragment(mapViewMapActivity)) {
+		if (showWelcomeScreen && FirstUsageWizardFragment.showFragment(this)) {
 			SecondSplashScreenFragment.SHOW = false;
 		} else if (SendAnalyticsBottomSheetDialogFragment.shouldShowDialog(app)) {
 			SendAnalyticsBottomSheetDialogFragment.showInstance(app, fragmentManager, null);
@@ -878,7 +879,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 					editingContext.setGpxData(gpxData);
 					MeasurementToolFragment.showInstance(getSupportFragmentManager(), editingContext, PLAN_ROUTE_MODE, true);
 				} else {
-					fragmentsHelper.closeAllFragments();
 					mapContextMenu.show(latLonToShow, mapLabelToShow, toShow);
 				}
 				if (editToShow) {
@@ -1164,6 +1164,10 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 		return app.getMapViewTrackingUtilities();
 	}
 
+	public MapDisplayPositionManager getMapPositionManager() {
+		return app.getMapViewTrackingUtilities().getMapDisplayPositionManager();
+	}
+
 	public MapActivityActions getMapActions() {
 		return mapActions;
 	}
@@ -1175,6 +1179,10 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 	@NonNull
 	public WidgetsVisibilityHelper getWidgetsVisibilityHelper() {
 		return mapWidgetsVisibilityHelper;
+	}
+
+	public static void launchMapActivityMoveToTop(@NonNull Context activity) {
+		launchMapActivityMoveToTop(activity, null, null, null);
 	}
 
 	public static void launchMapActivityMoveToTop(@NonNull Context activity,
@@ -1218,14 +1226,6 @@ public class MapActivity extends OsmandActionBarActivity implements DownloadEven
 			}
 			AndroidUtils.startActivityIfSafe(activity, newIntent);
 		}
-	}
-
-	public static void launchMapActivityMoveToTop(@NonNull Context activity) {
-		launchMapActivityMoveToTop(activity, null);
-	}
-
-	public static void launchMapActivityMoveToTop(@NonNull Context activity, @Nullable Bundle prevIntentParams) {
-		launchMapActivityMoveToTop(activity, prevIntentParams, null, null);
 	}
 
 	public static void clearPrevActivityIntent() {
