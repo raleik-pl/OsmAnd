@@ -243,7 +243,6 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 		List<BaseTrackFilter> newFiltersFilters = new ArrayList<>();
 //		currentFilters.clear();
 		LOG.debug("recreateFilters");
-		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_SENSOR_SPEED, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.NAME, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.DURATION, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.TIME_IN_MOTION, this));
@@ -259,6 +258,16 @@ public class TracksSearchFilter extends Filter implements FilterChangedListener 
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.COLOR, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.WIDTH, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.FOLDER, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.MAX_SENSOR_SPEED, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_SENSOR_SPEED, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.MAX_SENSOR_HEARTRATE, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_SENSOR_HEARTRATE, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.MAX_SENSOR_TEMPERATURE, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_SENSOR_TEMPERATURE, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.MAX_SENSOR_CADENCE, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_SENSOR_CADENCE, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.MAX_SENSOR_BYCICLE_POWER, this));
+		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.AVERAGE_SENSOR_BYCICLE_POWER, this));
 		newFiltersFilters.add(TrackFiltersHelper.createFilter(app, FilterType.OTHER, this));
 
 

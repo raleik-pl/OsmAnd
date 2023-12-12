@@ -332,8 +332,10 @@ class TracksFilterFragment : BaseOsmAndDialogFragment(),
 	}
 
 	private fun updateProgressVisibility(visible: Boolean) {
-		AndroidUiHelper.setVisibility(
-			if (visible) View.VISIBLE else View.GONE, progressBar)
+		app.runInUIThread{
+			AndroidUiHelper.setVisibility(
+				if (visible) View.VISIBLE else View.GONE, progressBar)
+		}
 	}
 
 	override fun onDismiss(dialog: DialogInterface) {

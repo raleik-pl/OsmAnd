@@ -266,6 +266,7 @@ public class GpxDbUtils {
 		map.put(MAX_ELEVATION, hasAnalysis ? analysis.maxElevation : null);
 		map.put(MAX_SPEED, hasAnalysis ? analysis.maxSpeed : null);
 		map.put(AVG_SPEED, hasAnalysis ? analysis.avgSpeed : null);
+		map.put(MIN_SENSOR_SPEED, hasAnalysis ? analysis.minSensorSpeed : null);
 		map.put(MAX_SENSOR_SPEED, hasAnalysis ? analysis.maxSensorSpeed : null);
 		map.put(AVG_SENSOR_SPEED, hasAnalysis ? analysis.avgSensorSpeed : null);
 		map.put(POINTS, hasAnalysis ? analysis.points : null);

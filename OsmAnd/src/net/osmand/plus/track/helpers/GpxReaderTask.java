@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.osmand.CorwinLogger;
 import net.osmand.binary.BinaryMapIndexReader.SearchPoiTypeFilter;
 import net.osmand.data.Amenity;
 import net.osmand.data.LatLon;
@@ -21,6 +22,7 @@ import net.osmand.plus.AppInitializer;
 import net.osmand.plus.AppInitializer.AppInitializeListener;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.api.SQLiteAPI.SQLiteConnection;
+import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.util.Algorithms;
 import net.osmand.util.MapUtils;
 
@@ -70,9 +72,12 @@ class GpxReaderTask extends AsyncTask<Void, GpxDataItem, Void> {
 				file = readingItems.poll();
 				while (file != null && !isCancelled()) {
 					GpxDataItem item = readingItemsMap.remove(file);
+					if(file.getName().contains("custom_")) {
+						CorwinLogger.log("");
+					}
 					if (GpxDbUtils.isAnalyseNeeded(file, item)) {
 						GPXFile gpxFile = GPXUtilities.loadGPXFile(file);
-						GPXTrackAnalysis analysis = gpxFile.getAnalysis(file.lastModified());
+						GPXTrackAnalysis analysis = gpxFile.getAnalysis(file.lastModified(), null, null, PluginsHelper.getTrackPointsAnalyser());
 						if (item == null) {
 							item = new GpxDataItem(file);
 							item.setAnalysis(analysis);

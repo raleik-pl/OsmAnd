@@ -3,6 +3,7 @@ package net.osmand.plus.configmap.tracks;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.osmand.CorwinLogger;
 import net.osmand.gpx.GPXFile;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
@@ -60,10 +61,16 @@ public class TrackItem {
 
 	@Nullable
 	public GpxDataItem getDataItem() {
+		if(getName().contains("custom")) {
+			CorwinLogger.log("");
+		}
 		return dataItem;
 	}
 
 	public void setDataItem(@Nullable GpxDataItem dataItem) {
+		if(getName().contains("custom")) {
+			CorwinLogger.log("");
+		}
 		this.dataItem = dataItem;
 	}
 

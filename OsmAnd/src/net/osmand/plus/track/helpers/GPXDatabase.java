@@ -9,6 +9,7 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.osmand.CorwinLogger;
 import net.osmand.PlatformUtil;
 import net.osmand.data.LatLon;
 import net.osmand.gpx.GPXTrackAnalysis;
@@ -212,9 +213,9 @@ public class GPXDatabase {
 		analysis.minSpeed = (float) query.getDouble(MAX_SPEED.getSelectColumnIndex());
 		analysis.maxSpeed = (float) query.getDouble(MAX_SPEED.getSelectColumnIndex());
 		analysis.avgSpeed = (float) query.getDouble(AVG_SPEED.getSelectColumnIndex());
-		analysis.minSpeed = (float) query.getDouble(MAX_SENSOR_SPEED.getSelectColumnIndex());
-		analysis.maxSpeed = (float) query.getDouble(MAX_SENSOR_SPEED.getSelectColumnIndex());
-		analysis.avgSpeed = (float) query.getDouble(AVG_SENSOR_SPEED.getSelectColumnIndex());
+		analysis.minSensorSpeed = (float) query.getDouble(MAX_SENSOR_SPEED.getSelectColumnIndex());
+		analysis.maxSensorSpeed = (float) query.getDouble(MAX_SENSOR_SPEED.getSelectColumnIndex());
+		analysis.avgSensorSpeed = (float) query.getDouble(AVG_SENSOR_SPEED.getSelectColumnIndex());
 		analysis.points = query.getInt(POINTS.getSelectColumnIndex());
 		analysis.wptPoints = query.getInt(WPT_POINTS.getSelectColumnIndex());
 
@@ -225,6 +226,9 @@ public class GPXDatabase {
 			double lat = query.getDouble(START_LAT.getSelectColumnIndex());
 			double lon = query.getDouble(START_LON.getSelectColumnIndex());
 			analysis.latLonStart = new LatLon(lat, lon);
+		}
+		if (fileName.contains("custom_")){
+			CorwinLogger.log("");
 		}
 		item.setAnalysis(analysis);
 		item.setParameter(COLOR, GPXUtilities.parseColor(query.getString(COLOR.getSelectColumnIndex()), 0));

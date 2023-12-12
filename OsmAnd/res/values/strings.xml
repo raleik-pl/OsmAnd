@@ -11,6 +11,24 @@
 	Thx - Hardy
 -->
 
+
+
+
+
+
+
+
+
+
+    <string name="max_sensor_heartrate">Heart rate, max</string>
+    <string name="avg_sensor_heartrate">Heart rate, average</string>
+    <string name="max_sensor_cadence">Bicycle Cadence, max</string>
+    <string name="avg_sensor_cadence">Bicycle Cadence, average</string>
+    <string name="max_sensor_bycicle_power">Bicycle Power, max</string>
+    <string name="avg_sensor_bycicle_power">Bicycle Power, average</string>
+    <string name="max_sensor_temperature">Temperature, max</string>
+    <string name="avg_sensor_temperature">Temperature, average</string>
+    <string name="max_sensor_speed">Sensor speed, max</string>
     <string name="avg_sensor_speed">Sensor speed, average</string>
     <string name="use_v1_auto_zoom">Discrete auto zoom (old version)</string>
     <string name="button_already_assigned_to_this_action">This button is already assigned to this action.</string>

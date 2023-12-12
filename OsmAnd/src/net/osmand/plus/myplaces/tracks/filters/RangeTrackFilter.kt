@@ -113,7 +113,7 @@ open class RangeTrackFilter<T : Comparable<T>>(
 			(filterType.propertyList[0].typeClass.cast(trackItem.dataItem?.getParameter(filterType.propertyList[0])))
 				?: return false
 
-		if (trackItem.name.contains("Tue 08 Aug 2023_2")) {
+		if (trackItem.name.contains("custom_sensor")) {
 			CorwinLogger.log("sss")
 		}
 		val comparableValue = getComparableValue(value)

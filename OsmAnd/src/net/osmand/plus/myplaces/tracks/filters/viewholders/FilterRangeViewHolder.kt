@@ -144,9 +144,9 @@ open class FilterRangeViewHolder(
 		this.filter = filter
 		title.setText(filter.filterType.nameResId)
 		valueFromInputContainer.labelText =
-			"${app.getString(R.string.shared_string_from)}, ${app.getString(getFilterUnit())}"
+			"${app.getString(R.string.shared_string_from)}, ${getFilterUnitText()}"
 		valueToInputContainer.labelText =
-			"${app.getString(R.string.shared_string_to)}, ${app.getString(getFilterUnit())}"
+			"${app.getString(R.string.shared_string_to)}, ${getFilterUnitText()}"
 		updateExpandState()
 		updateValues()
 	}
@@ -173,9 +173,9 @@ open class FilterRangeViewHolder(
 		valueToInput.setText(valueTo.toString())
 		valueToInput.setSelection(valueToInput.length())
 		val minValuePrompt =
-			"${decimalFormat.format(minValue.toFloat())} ${app.getString(getFilterUnit())}"
+			"${decimalFormat.format(minValue.toFloat())} ${getFilterUnitText()}"
 		val maxValuePrompt =
-			"${decimalFormat.format(maxValue.toFloat())} ${app.getString(getFilterUnit())}"
+			"${decimalFormat.format(maxValue.toFloat())} ${getFilterUnitText()}"
 		minFilterValue.text = minValuePrompt
 		maxFilterValue.text = maxValuePrompt
 		AndroidUiHelper.updateVisibility(selectedValue, filter.isEnabled())
@@ -194,10 +194,14 @@ open class FilterRangeViewHolder(
 				app.getString(R.string.track_filter_range_selected_format),
 				fromTxt,
 				toTxt,
-				app.getString(getFilterUnit()))
+				getFilterUnitText())
 		}
 	}
 
+	fun getFilterUnitText():String {
+		val unitResId = getFilterUnit()
+		return if(unitResId > 0) app.getString(unitResId) else ""
+	}
 
 	fun getFilterUnit(): Int {
 		return when (filter.filterType.measureUnitType) {

@@ -99,7 +99,7 @@ public class SelectedGpxFile {
 				? System.currentTimeMillis()
 				: new File(gpxFile.path).lastModified();
 		trackAnalysis = gpxFile.getAnalysis(fileTimestamp, null, null, PluginsHelper.getTrackPointsAnalyser());
-
+//**
 		updateSplit(app);
 
 		if (filteredSelectedGpxFile != null) {

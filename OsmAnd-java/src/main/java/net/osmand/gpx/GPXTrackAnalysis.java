@@ -290,8 +290,13 @@ public class GPXTrackAnalysis {
 				PointAttributes attribute = new PointAttributes(distance, timeDiff, firstPoint, lastPoint);
 				attribute.speed = speed;
 				attribute.elevation = elevation;
+//				if(name.contains("custom_")) {
+//					LOG.error("");
+//				}
 				addWptAttribute(point, attribute, pointsAnalyser);
 				if (attribute.sensorSpeed > 0) {
+					minSensorSpeed = Math.min(attribute.sensorSpeed, minSensorSpeed);
+					maxSensorSpeed = Math.max(attribute.sensorSpeed, maxSensorSpeed);
 					sensorSpeedCount++;
 					totalSensorSpeedSum += attribute.sensorSpeed;
 				}
