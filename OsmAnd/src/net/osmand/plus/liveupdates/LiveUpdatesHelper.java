@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import net.osmand.plus.OsmandApplication;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.settings.backend.preferences.CommonPreference;
 import net.osmand.plus.settings.backend.OsmandSettings;
 import net.osmand.plus.R;
@@ -254,7 +254,7 @@ public class LiveUpdatesHelper {
 	}
 
 	public static void runLiveUpdate(Context context, boolean userRequested, LiveUpdateListener listener) {
-		for (LocalItem mapToUpdate : listener.getMapsToUpdate()) {
+		for (LocalFileItem mapToUpdate : listener.getMapsToUpdate()) {
 			runLiveUpdate(context, getFileNameWithoutRoadSuffix(mapToUpdate), userRequested, listener::processFinish);
 		}
 	}
@@ -262,6 +262,6 @@ public class LiveUpdatesHelper {
 	public interface LiveUpdateListener {
 		void processFinish();
 
-		List<LocalItem> getMapsToUpdate();
+		List<LocalFileItem> getMapsToUpdate();
 	}
 }

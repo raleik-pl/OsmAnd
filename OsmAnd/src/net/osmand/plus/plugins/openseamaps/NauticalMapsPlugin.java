@@ -16,7 +16,7 @@ import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.dashboard.DashboardOnMap;
 import net.osmand.plus.dashboard.DashboardOnMap.DashboardType;
 import net.osmand.plus.download.local.LocalIndexHelper;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.plugins.OsmandPlugin;
 import net.osmand.plus.plugins.PluginsHelper;
 import net.osmand.plus.plugins.srtm.SRTMPlugin;
@@ -122,7 +122,7 @@ public class NauticalMapsPlugin extends OsmandPlugin {
 	private boolean hasDepthMaps() {
 		boolean readFiles = !app.getResourceManager().isIndexesLoadedOnStart();
 		LocalIndexHelper helper = new LocalIndexHelper(app);
-		List<LocalItem> depthIndexData = helper.getLocalIndexItems(readFiles, false, null, DEPTH_DATA);
+		List<LocalFileItem> depthIndexData = helper.getLocalIndexItems(readFiles, false, null, DEPTH_DATA);
 		return !Algorithms.isEmpty(depthIndexData);
 	}
 

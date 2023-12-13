@@ -22,7 +22,7 @@ import net.osmand.core.jni.ZoomLevelDoubleListHash;
 import net.osmand.map.WorldRegion;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.download.local.LocalIndexHelper;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.plugins.weather.containers.WeatherTotalCacheSize;
 import net.osmand.plus.plugins.weather.units.WeatherUnit;
 import net.osmand.plus.utils.OsmAndFormatter;
@@ -133,7 +133,7 @@ public class WeatherHelper {
 
 	public void updateForecastCache() {
 		LocalIndexHelper helper = new LocalIndexHelper(app);
-		for (LocalItem item : helper.getLocalIndexItems(true, false, null, WEATHER_DATA)) {
+		for (LocalFileItem item : helper.getLocalIndexItems(true, false, null, WEATHER_DATA)) {
 			updateForecastCache(item.getPath());
 		}
 	}

@@ -25,7 +25,7 @@ import net.osmand.plus.download.DownloadIndexesThread.DownloadEvents;
 import net.osmand.plus.download.DownloadResources;
 import net.osmand.plus.download.DownloadValidationManager;
 import net.osmand.plus.download.IndexItem;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalOperationTask;
 import net.osmand.plus.download.local.LocalOperationTask.OperationListener;
 import net.osmand.plus.download.local.OperationType;
@@ -248,10 +248,10 @@ public class OfflineWeatherForecastCard extends MapBaseCard implements DownloadE
 	}
 
 	private void remove(@NonNull List<File> filesToDelete) {
-		LocalItem[] params = new LocalItem[filesToDelete.size()];
+		LocalFileItem[] params = new LocalFileItem[filesToDelete.size()];
 		for (int i = 0; i < filesToDelete.size(); i++) {
 			File file = filesToDelete.get(i);
-			params[i] = new LocalItem(file, WEATHER_DATA);
+			params[i] = new LocalFileItem(file, WEATHER_DATA);
 		}
 		LocalOperationTask removeTask = new LocalOperationTask(app, DELETE_OPERATION, this);
 		removeTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);

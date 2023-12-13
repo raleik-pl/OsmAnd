@@ -29,8 +29,9 @@ import net.osmand.plus.download.DownloadActivity;
 import net.osmand.plus.download.local.CategoryType;
 import net.osmand.plus.download.local.LocalCategory;
 import net.osmand.plus.download.local.LocalGroup;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalItemType;
+import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.download.local.dialogs.LocalItemsAdapter.LocalItemListener;
 import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.settings.enums.MapsSortMode;
@@ -168,8 +169,8 @@ public class LocalSearchFragment extends LocalBaseFragment implements LocalItemL
 	}
 
 	@NonNull
-	private List<LocalItem> getSortedItems() {
-		List<LocalItem> items = new ArrayList<>();
+	private List<LocalFileItem> getSortedItems() {
+		List<LocalFileItem> items = new ArrayList<>();
 
 		Map<CategoryType, LocalCategory> categories = getCategories();
 		if (!Algorithms.isEmpty(categories)) {
@@ -191,13 +192,13 @@ public class LocalSearchFragment extends LocalBaseFragment implements LocalItemL
 		return items;
 	}
 
-	private void sortItems(@NonNull List<LocalItem> items) {
+	private void sortItems(@NonNull List<LocalFileItem> items) {
 		if (type == MAP_DATA) {
 			MapsSortMode sortMode = settings.LOCAL_MAPS_SORT_MODE.get();
 			Collections.sort(items, new MapsComparator(app, sortMode));
 		} else {
 			Collator collator = OsmAndCollator.primaryCollator();
-			Collections.sort(items, (o1, o2) -> collator.compare(o1.getName(app).toString(), o2.getName(app).toString()));
+			Collections.sort(items, (o1, o2) -> collator.compare(LocalItemUtils.getItemName(app, o1).toString(), LocalItemUtils.getItemName(app, o2).toString()));
 		}
 	}
 
@@ -245,12 +246,12 @@ public class LocalSearchFragment extends LocalBaseFragment implements LocalItemL
 	}
 
 	@Override
-	public boolean itemUpdateAvailable(@NonNull LocalItem item) {
+	public boolean itemUpdateAvailable(@NonNull LocalFileItem item) {
 		return getItemsToUpdate().containsKey(item.getFile().getName());
 	}
 
 	@Override
-	public void onItemSelected(@NonNull LocalItem item) {
+	public void onItemSelected(@NonNull LocalFileItem item) {
 		FragmentManager manager = getFragmentManager();
 		if (manager != null) {
 			LocalItemFragment.showInstance(manager, item, this);
@@ -258,7 +259,7 @@ public class LocalSearchFragment extends LocalBaseFragment implements LocalItemL
 	}
 
 	@Override
-	public void onItemOptionsSelected(@NonNull LocalItem item, @NonNull View view) {
+	public void onItemOptionsSelected(@NonNull LocalFileItem item, @NonNull View view) {
 		DownloadActivity activity = getDownloadActivity();
 		if (activity != null) {
 			ItemMenuProvider menuProvider = new ItemMenuProvider(activity, this);

@@ -38,7 +38,7 @@ import net.osmand.plus.download.DownloadIndexesThread;
 import net.osmand.plus.download.DownloadResources;
 import net.osmand.plus.download.IndexItem;
 import net.osmand.plus.download.local.LocalIndexHelper;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.ui.DownloadMapToolbarController;
 import net.osmand.plus.mapcontextmenu.MapContextMenu;
 import net.osmand.plus.mapcontextmenu.other.MapMultiSelectionMenu;
@@ -118,7 +118,7 @@ public class DownloadedRegionsLayer extends OsmandMapLayer implements IContextMe
 		private final BinaryMapDataObject dataObject;
 		private final WorldRegion worldRegion;
 		private final IndexItem indexItem;
-		private final LocalItem localItem;
+		private final LocalFileItem localItem;
 
 		@NonNull
 		public BinaryMapDataObject getDataObject() {
@@ -136,14 +136,14 @@ public class DownloadedRegionsLayer extends OsmandMapLayer implements IContextMe
 		}
 
 		@Nullable
-		public LocalItem getLocalItem() {
+		public LocalFileItem getLocalItem() {
 			return localItem;
 		}
 
 		public DownloadMapObject(@NonNull BinaryMapDataObject dataObject,
 		                         @NonNull WorldRegion worldRegion,
 		                         @Nullable IndexItem indexItem,
-		                         @Nullable LocalItem localItem) {
+		                         @Nullable LocalFileItem localItem) {
 			this.dataObject = dataObject;
 			this.worldRegion = worldRegion;
 			this.indexItem = indexItem;
@@ -631,11 +631,11 @@ public class DownloadedRegionsLayer extends OsmandMapLayer implements IContextMe
 						}
 					} else {
 						String downloadName = osmandRegions.getDownloadName(o);
-						List<LocalItem> infos = helper.getLocalItems(downloadName);
+						List<LocalFileItem> infos = helper.getLocalItems(downloadName);
 						if (infos.size() == 0) {
 							dataObjects.add(new DownloadMapObject(o, region, null, null));
 						} else {
-							for (LocalItem info : infos) {
+							for (LocalFileItem info : infos) {
 								dataObjects.add(new DownloadMapObject(o, region, null, info));
 							}
 						}

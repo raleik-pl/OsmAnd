@@ -19,7 +19,7 @@ import net.osmand.PlatformUtil;
 import net.osmand.osm.io.NetworkUtils;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.download.local.LocalIndexHelper;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.resources.ResourceManager;
 
 import org.apache.commons.logging.Log;
@@ -240,7 +240,7 @@ public class DownloadOsmandIndexesHelper {
 	private static List<IndexItem> listCustomTtsVoiceIndexes(OsmandApplication app, List<AssetEntry> bundledAssets) {
 		File voiceDirPath = app.getAppPath(VOICE_INDEX_DIR);
 		LocalIndexHelper localIndexHelper = new LocalIndexHelper(app);
-		List<LocalItem> localItems = new ArrayList<>();
+		List<LocalFileItem> localItems = new ArrayList<>();
 		List<IndexItem> customTTS = new ArrayList<>();
 		long installDate = getInstallDate(app);
 
@@ -249,7 +249,7 @@ public class DownloadOsmandIndexesHelper {
 			localIndexHelper.loadVoiceData(voiceDirPath, localItems,
 					true, true, resourceManager.getIndexFiles(), null);
 		}
-		for (LocalItem item : localItems) {
+		for (LocalFileItem item : localItems) {
 			if (!item.getFileName().contains("tts")) {
 				continue;
 			}
@@ -277,12 +277,12 @@ public class DownloadOsmandIndexesHelper {
 	public static List<IndexItem> listLocalRecordedVoiceIndexes(OsmandApplication app) {
 		File voiceDirPath = app.getAppPath(VOICE_INDEX_DIR);
 		LocalIndexHelper localIndexHelper = new LocalIndexHelper(app);
-		List<LocalItem> localItems = new ArrayList<>();
+		List<LocalFileItem> localItems = new ArrayList<>();
 		List<IndexItem> recordedVoiceList = new ArrayList<>();
 
 		localIndexHelper.loadVoiceData(voiceDirPath, localItems, true, true,
 				app.getResourceManager().getIndexFiles(), null);
-		for (LocalItem item : localItems) {
+		for (LocalFileItem item : localItems) {
 			if (item.getType() != VOICE_DATA || item.getFileName().contains("tts")) {
 				continue;
 			}

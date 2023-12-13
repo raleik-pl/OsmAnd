@@ -58,7 +58,7 @@ import net.osmand.plus.base.BaseOsmAndDialogFragment;
 import net.osmand.plus.base.OsmandBaseExpandableListAdapter;
 import net.osmand.plus.chooseplan.ChoosePlanFragment;
 import net.osmand.plus.chooseplan.OsmAndFeature;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.helpers.FontCache;
@@ -116,7 +116,7 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 	}
 
 	public static void showUpdateDialog(Activity activity, FragmentManager fragmentManager, LiveUpdateListener listener) {
-		List<LocalItem> mapsToUpdate = listener.getMapsToUpdate();
+		List<LocalFileItem> mapsToUpdate = listener.getMapsToUpdate();
 		if (!Algorithms.isEmpty(mapsToUpdate)) {
 			int countEnabled = listener.getMapsToUpdate().size();
 			if (countEnabled == 1) {
@@ -339,8 +339,8 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 	private void enableLiveUpdates(boolean enable) {
 		if (!Algorithms.isEmpty(adapter.localItems)) {
 			AlarmManager alarmMgr = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
-			List<LocalItem> mapsToUpdate = getMapsToUpdate(adapter.localItems, settings);
-			for (LocalItem item : mapsToUpdate) {
+			List<LocalFileItem> mapsToUpdate = getMapsToUpdate(adapter.localItems, settings);
+			for (LocalFileItem item : mapsToUpdate) {
 				String fileName = getFileNameWithoutRoadSuffix(item);
 				PendingIntent alarmIntent = getPendingIntent(app, fileName);
 				if (enable) {
@@ -364,7 +364,7 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 		}
 	}
 
-	public static int updateCountEnabled(TextView countView, List<LocalItem> mapsList, OsmandSettings settings) {
+	public static int updateCountEnabled(TextView countView, List<LocalFileItem> mapsList, OsmandSettings settings) {
 		int countEnabled = getMapsToUpdate(mapsList, settings).size();
 		if (countView != null) {
 			String countText = countEnabled + "/" + mapsList.size();
@@ -373,9 +373,9 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 		return countEnabled;
 	}
 
-	public static List<LocalItem> getMapsToUpdate(List<LocalItem> mapsList, OsmandSettings settings) {
-		List<LocalItem> listToUpdate = new ArrayList<>();
-		for (LocalItem mapToUpdate : mapsList) {
+	public static List<LocalFileItem> getMapsToUpdate(List<LocalFileItem> mapsList, OsmandSettings settings) {
+		List<LocalFileItem> listToUpdate = new ArrayList<>();
+		for (LocalFileItem mapToUpdate : mapsList) {
 			CommonPreference<Boolean> preference = preferenceForLocalIndex(getFileNameWithoutRoadSuffix(mapToUpdate), settings);
 			if (preference.get()) {
 				listToUpdate.add(mapToUpdate);
@@ -385,10 +385,10 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 	}
 
 	protected class LiveMapsAdapter extends OsmandBaseExpandableListAdapter implements LocalIndexInfoAdapter {
-		private final List<LocalItem> localItems = new ArrayList<>();
+		private final List<LocalFileItem> localItems = new ArrayList<>();
 
 		@Override
-		public void addData(@NonNull List<LocalItem> indexes) {
+		public void addData(@NonNull List<LocalFileItem> indexes) {
 			if (LocalItemUtils.addUnique(localItems, indexes)) {
 				notifyDataSetChanged();
 			}
@@ -413,13 +413,13 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 				if (prefSort != 0) {
 					return prefSort;
 				}
-				return o1.compareTo(o2);
+				return o1.getFileName().compareTo(o2.getFileName());
 			});
 			notifyDataSetInvalidated();
 		}
 
 		@Override
-		public LocalItem getChild(int groupPosition, int childPosition) {
+		public LocalFileItem getChild(int groupPosition, int childPosition) {
 			return localItems.get(childPosition);
 		}
 
@@ -621,7 +621,7 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 	}
 
 	@Override
-	public List<LocalItem> getMapsToUpdate() {
+	public List<LocalFileItem> getMapsToUpdate() {
 		return getMapsToUpdate(adapter.localItems, settings);
 	}
 
@@ -668,7 +668,7 @@ public class LiveUpdatesFragment extends BaseOsmAndDialogFragment implements OnL
 	}
 
 	@NonNull
-	public static String getFileNameWithoutRoadSuffix(@NonNull LocalItem item) {
+	public static String getFileNameWithoutRoadSuffix(@NonNull LocalFileItem item) {
 		String fileName = item.getFileName();
 		if (fileName.endsWith(BINARY_ROAD_MAP_INDEX_EXT)) {
 			return fileName.substring(0, fileName.lastIndexOf(BINARY_ROAD_MAP_INDEX_EXT)) + BINARY_MAP_INDEX_EXT;

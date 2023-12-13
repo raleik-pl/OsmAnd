@@ -12,8 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalItemType;
+import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.download.local.dialogs.LocalItemsAdapter.LocalItemListener;
 import net.osmand.plus.helpers.AndroidUiHelper;
 import net.osmand.plus.utils.AndroidUtils;
@@ -54,10 +55,10 @@ public class LocalItemHolder extends RecyclerView.ViewHolder {
 		AndroidUtils.setBackground(itemView.findViewById(R.id.selectable_list_item), drawable);
 	}
 
-	public void bindView(@NonNull LocalItem item, boolean selectionMode, boolean lastItem, boolean hideDivider) {
+	public void bindView(@NonNull LocalFileItem item, boolean selectionMode, boolean lastItem, boolean hideDivider) {
 		Context context = itemView.getContext();
-		title.setText(item.getName(context));
-		description.setText(item.getDescription(context));
+		title.setText(LocalItemUtils.getItemName(context, item));
+		description.setText(LocalItemUtils.getItemDescription(context, item));
 		icon.setImageDrawable(getIcon(item));
 
 		boolean selected = listener != null && listener.isItemSelected(item);
@@ -80,7 +81,7 @@ public class LocalItemHolder extends RecyclerView.ViewHolder {
 	}
 
 	@NonNull
-	private Drawable getIcon(@NonNull LocalItem item) {
+	private Drawable getIcon(@NonNull LocalFileItem item) {
 		LocalItemType type = item.getType();
 		if (type.isDownloadType() && !item.isBackuped(app)) {
 			boolean shouldUpdate = listener.itemUpdateAvailable(item);

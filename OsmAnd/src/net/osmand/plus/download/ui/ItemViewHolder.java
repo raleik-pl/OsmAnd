@@ -56,7 +56,7 @@ import net.osmand.plus.download.IndexItem;
 import net.osmand.plus.download.MultipleDownloadItem;
 import net.osmand.plus.download.SelectIndexesHelper;
 import net.osmand.plus.download.local.LocalItemType;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.download.local.LocalOperationTask;
 import net.osmand.plus.helpers.FileNameTranslationHelper;
@@ -571,12 +571,12 @@ public class ItemViewHolder {
 
 	private void remove(@NonNull List<File> filesToDelete) {
 		OsmandApplication app = context.getMyApplication();
-		LocalItem[] params = new LocalItem[filesToDelete.size()];
+		LocalFileItem[] params = new LocalFileItem[filesToDelete.size()];
 		for (int i = 0; i < filesToDelete.size(); i++) {
 			File file = filesToDelete.get(i);
 			LocalItemType type = LocalItemUtils.getItemType(app, file);
 			if (type != null) {
-				params[i] = new LocalItem(file, type);
+				params[i] = new LocalFileItem(file, type);
 			}
 		}
 		LocalOperationTask removeTask = new LocalOperationTask(app, DELETE_OPERATION, null);

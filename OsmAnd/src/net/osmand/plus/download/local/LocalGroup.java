@@ -10,7 +10,7 @@ import java.util.List;
 public class LocalGroup {
 
 	private final LocalItemType type;
-	private final List<LocalItem> items = new ArrayList<>();
+	private final List<LocalFileItem> items = new ArrayList<>();
 
 	public LocalGroup(@NonNull LocalItemType type) {
 		this.type = type;
@@ -22,7 +22,7 @@ public class LocalGroup {
 	}
 
 	@NonNull
-	public List<LocalItem> getItems() {
+	public List<LocalFileItem> getItems() {
 		return items;
 	}
 
@@ -31,17 +31,17 @@ public class LocalGroup {
 		return type.toHumanString(context);
 	}
 
-	public void addItem(@NonNull LocalItem localItem) {
+	public void addItem(@NonNull LocalFileItem localItem) {
 		items.add(localItem);
 	}
 
-	public void removeItem(@NonNull LocalItem localItem) {
+	public void removeItem(@NonNull LocalFileItem localItem) {
 		items.remove(localItem);
 	}
 
 	public long getSize() {
 		long size = 0;
-		for (LocalItem item : items) {
+		for (LocalFileItem item : items) {
 			size += item.getSize();
 		}
 		return size;

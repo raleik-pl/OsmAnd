@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.dialogs.LocalItemsAdapter.LocalItemListener;
 import net.osmand.plus.download.local.dialogs.viewholders.LocalItemHolder;
 import net.osmand.plus.utils.UiUtilities;
@@ -24,7 +24,7 @@ import java.util.List;
 
 public class LocalSearchAdapter extends RecyclerView.Adapter<ViewHolder> implements Filterable {
 
-	private final List<LocalItem> items = new ArrayList<>();
+	private final List<LocalFileItem> items = new ArrayList<>();
 
 	private final LocalSearchFilter filter;
 	private final LocalItemListener listener;
@@ -44,7 +44,7 @@ public class LocalSearchAdapter extends RecyclerView.Adapter<ViewHolder> impleme
 		themedInflater = UiUtilities.getInflater(app, nightMode);
 	}
 
-	public void setItems(@NonNull List<LocalItem> items) {
+	public void setItems(@NonNull List<LocalFileItem> items) {
 		this.items.clear();
 		this.items.addAll(items);
 		filter.setItems(items);
@@ -67,7 +67,7 @@ public class LocalSearchAdapter extends RecyclerView.Adapter<ViewHolder> impleme
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		if (holder instanceof LocalItemHolder) {
-			LocalItem item = items.get(position);
+			LocalFileItem item = items.get(position);
 			boolean lastItem = position == getItemCount() - 1;
 
 			LocalItemHolder viewHolder = (LocalItemHolder) holder;
@@ -90,11 +90,11 @@ public class LocalSearchAdapter extends RecyclerView.Adapter<ViewHolder> impleme
 		return items.size();
 	}
 
-	public int getItemPosition(@NonNull LocalItem item) {
+	public int getItemPosition(@NonNull LocalFileItem item) {
 		return items.indexOf(item);
 	}
 
-	public void updateItem(@NonNull LocalItem item) {
+	public void updateItem(@NonNull LocalFileItem item) {
 		int index = getItemPosition(item);
 		if (index != -1) {
 			notifyItemChanged(index);

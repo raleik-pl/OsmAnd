@@ -35,8 +35,9 @@ import net.osmand.plus.R;
 import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.download.DownloadActivity;
 import net.osmand.plus.download.IndexItem;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalItemType;
+import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.download.local.LocalOperationTask;
 import net.osmand.plus.download.local.OperationType;
 import net.osmand.plus.plugins.rastermaps.OsmandRasterMapsPlugin;
@@ -58,7 +59,7 @@ public class ItemMenuProvider implements MenuProvider {
 	private final LocalBaseFragment fragment;
 	private final boolean nightMode;
 
-	private LocalItem localItem;
+	private LocalFileItem localItem;
 
 	@ColorRes
 	private int colorId;
@@ -76,7 +77,7 @@ public class ItemMenuProvider implements MenuProvider {
 		this.colorId = colorId;
 	}
 
-	public void setLocalItem(@NonNull LocalItem localItem) {
+	public void setLocalItem(@NonNull LocalFileItem localItem) {
 		this.localItem = localItem;
 	}
 
@@ -217,7 +218,7 @@ public class ItemMenuProvider implements MenuProvider {
 			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, localItem);
 		});
 		builder.setNegativeButton(R.string.shared_string_no, null);
-		builder.setMessage(app.getString(R.string.clear_confirmation_msg, localItem.getName(context)));
+		builder.setMessage(app.getString(R.string.clear_confirmation_msg, LocalItemUtils.getItemName(context, localItem)));
 		builder.show();
 	}
 
@@ -228,7 +229,7 @@ public class ItemMenuProvider implements MenuProvider {
 			activity.startDownload(indexItem);
 		} else {
 			Context context = UiUtilities.getThemedContext(activity, nightMode);
-			String text = app.getString(R.string.map_is_up_to_date, localItem.getName(context));
+			String text = app.getString(R.string.map_is_up_to_date, LocalItemUtils.getItemName(context, localItem));
 			Snackbar snackbar = Snackbar.make(activity.getLayout(), text, Snackbar.LENGTH_LONG);
 			UiUtilities.setupSnackbar(snackbar, nightMode, 5);
 			snackbar.show();

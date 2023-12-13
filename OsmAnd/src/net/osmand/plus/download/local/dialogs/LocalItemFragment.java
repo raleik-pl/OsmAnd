@@ -21,7 +21,7 @@ import net.osmand.plus.R;
 import net.osmand.plus.download.DownloadActivity;
 import net.osmand.plus.download.local.CategoryType;
 import net.osmand.plus.download.local.LocalCategory;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalItemType;
 import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.download.local.LocalOperationTask.OperationListener;
@@ -40,7 +40,7 @@ public class LocalItemFragment extends LocalBaseFragment implements ConfirmDelet
 
 	public static final String TAG = LocalItemFragment.class.getSimpleName();
 
-	private LocalItem localItem;
+	private LocalFileItem localItem;
 	private ItemMenuProvider menuProvider;
 	private ViewGroup itemsContainer;
 	private CollapsingToolbarLayout toolbarLayout;
@@ -96,7 +96,7 @@ public class LocalItemFragment extends LocalBaseFragment implements ConfirmDelet
 
 	private void updateToolbar() {
 		menuProvider.setLocalItem(localItem);
-		toolbarLayout.setTitle(localItem.getName(app).toString());
+		toolbarLayout.setTitle(LocalItemUtils.getItemName(app, localItem).toString());
 	}
 
 	private void updateContent() {
@@ -137,14 +137,14 @@ public class LocalItemFragment extends LocalBaseFragment implements ConfirmDelet
 
 		LocalItemType type = LocalItemUtils.getItemType(app, dest);
 		if (type != null) {
-			localItem = new LocalItem(dest, type);
+			localItem = new LocalFileItem(dest, type);
 			LocalItemUtils.updateItem(app, localItem);
 		}
 		updateToolbar();
 		updateContent();
 	}
 
-	public static void showInstance(@NonNull FragmentManager manager, @NonNull LocalItem localItem, @Nullable Fragment target) {
+	public static void showInstance(@NonNull FragmentManager manager, @NonNull LocalFileItem localItem, @Nullable Fragment target) {
 		if (AndroidUtils.isFragmentCanBeAdded(manager, TAG)) {
 			LocalItemFragment fragment = new LocalItemFragment();
 			fragment.localItem = localItem;

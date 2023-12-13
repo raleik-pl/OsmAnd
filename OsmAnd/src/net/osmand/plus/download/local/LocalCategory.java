@@ -31,7 +31,7 @@ public class LocalCategory {
 		return context.getString(type.getTitleId());
 	}
 
-	public void addLocalItem(@NonNull LocalItem item) {
+	public void addLocalItem(@NonNull LocalFileItem item) {
 		LocalItemType itemType = item.getType();
 
 		LocalGroup group = groups.get(itemType);

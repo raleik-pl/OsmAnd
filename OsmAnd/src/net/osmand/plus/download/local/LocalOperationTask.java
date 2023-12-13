@@ -54,7 +54,7 @@ import net.osmand.util.Algorithms;
 
 import java.io.File;
 
-public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> {
+public class LocalOperationTask extends AsyncTask<LocalFileItem, LocalFileItem, String> {
 
 	private final OsmandApplication app;
 	private final OperationType type;
@@ -74,17 +74,17 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 	}
 
 	@Override
-	protected void onProgressUpdate(LocalItem... values) {
+	protected void onProgressUpdate(LocalFileItem... values) {
 		if (listener != null) {
 			listener.onOperationProgress(type, values);
 		}
 	}
 
 	@Override
-	protected String doInBackground(LocalItem... params) {
+	protected String doInBackground(LocalFileItem... params) {
 		int count = 0;
 		int total = 0;
-		for (LocalItem item : params) {
+		for (LocalFileItem item : params) {
 			if (!isCancelled()) {
 				boolean success = processItem(item);
 				total++;
@@ -115,7 +115,7 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 		}
 	}
 
-	private boolean processItem(@NonNull LocalItem item) {
+	private boolean processItem(@NonNull LocalFileItem item) {
 		if (type == DELETE_OPERATION) {
 			return deleteItem(item);
 		} else if (type == RESTORE_OPERATION) {
@@ -128,7 +128,7 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 		return false;
 	}
 
-	private boolean deleteItem(@NonNull LocalItem item) {
+	private boolean deleteItem(@NonNull LocalFileItem item) {
 		File file = item.getFile();
 		boolean success = Algorithms.removeAllFiles(file);
 
@@ -157,11 +157,11 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 		return success;
 	}
 
-	private boolean restoreItem(@NonNull LocalItem item) {
+	private boolean restoreItem(@NonNull LocalFileItem item) {
 		return FileUtils.move(item.getFile(), getFileToRestore(item));
 	}
 
-	private boolean backupItem(@NonNull LocalItem item) {
+	private boolean backupItem(@NonNull LocalFileItem item) {
 		File file = item.getFile();
 		boolean success = FileUtils.move(file, getFileToBackup(item));
 		if (success) {
@@ -170,7 +170,7 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 		return success;
 	}
 
-	private boolean clearTilesItem(@NonNull LocalItem item) {
+	private boolean clearTilesItem(@NonNull LocalFileItem item) {
 		ITileSource source = (ITileSource) item.getAttachedObject();
 		if (source != null) {
 			source.deleteTiles(item.getFile().getAbsolutePath());
@@ -180,7 +180,7 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 	}
 
 	@NonNull
-	private File getFileToBackup(@NonNull LocalItem item) {
+	private File getFileToBackup(@NonNull LocalFileItem item) {
 		File file = item.getFile();
 		if (!item.isBackuped(app)) {
 			File path = item.isHidden(app) ? app.getAppInternalPath(HIDDEN_BACKUP_DIR) : app.getAppPath(BACKUP_INDEX_DIR);
@@ -190,7 +190,7 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 	}
 
 	@NonNull
-	private File getFileToRestore(@NonNull LocalItem item) {
+	private File getFileToRestore(@NonNull LocalFileItem item) {
 		File file = item.getFile();
 		String fileName = file.getName();
 		if (item.isBackuped(app)) {
@@ -239,7 +239,7 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 	}
 
 	// Clear tiles for both Mapillary sources together
-	private void clearMapillaryTiles(@NonNull LocalItem item) {
+	private void clearMapillaryTiles(@NonNull LocalFileItem item) {
 		ITileSource src = (ITileSource) item.getAttachedObject();
 		ITileSource mapilaryCache = TileSourceManager.getMapillaryCacheSource();
 		ITileSource mapilaryVector = TileSourceManager.getMapillaryVectorSource();
@@ -274,7 +274,7 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 		}
 	}
 
-	private void clearHeightmapTiles(@NonNull LocalItem item) {
+	private void clearHeightmapTiles(@NonNull LocalFileItem item) {
 		String filePath = item.getFile().getAbsolutePath();
 		boolean heightmap = filePath.endsWith(TIF_EXT);
 		MapRendererContext mapRendererContext = NativeCoreContext.getMapRendererContext();
@@ -288,7 +288,7 @@ public class LocalOperationTask extends AsyncTask<LocalItem, LocalItem, String> 
 
 		}
 
-		default void onOperationProgress(@NonNull OperationType type, @NonNull LocalItem... items) {
+		default void onOperationProgress(@NonNull OperationType type, @NonNull LocalFileItem... items) {
 
 		}
 

@@ -25,10 +25,11 @@ import net.osmand.plus.activities.MapActivity;
 import net.osmand.plus.download.DownloadActivityType;
 import net.osmand.plus.download.DownloadIndexesThread;
 import net.osmand.plus.download.IndexItem;
-import net.osmand.plus.download.local.LocalIndexHelper;
-import net.osmand.plus.download.local.LocalItemType;
-import net.osmand.plus.download.local.LocalItem;
 import net.osmand.plus.download.SrtmDownloadItem;
+import net.osmand.plus.download.local.LocalIndexHelper;
+import net.osmand.plus.download.local.LocalFileItem;
+import net.osmand.plus.download.local.LocalItemType;
+import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.helpers.FileNameTranslationHelper;
 import net.osmand.plus.inapp.InAppPurchaseUtils;
 import net.osmand.plus.liveupdates.LiveUpdatesHelper;
@@ -57,8 +58,8 @@ public class MapDataMenuController extends MenuController {
 
 	private DownloadMapObject mapObject;
 	private List<IndexItem> otherIndexItems;
-	private final LocalItem localItem;
-	private List<LocalItem> otherLocalItems;
+	private final LocalFileItem localItem;
+	private List<LocalFileItem> otherLocalItems;
 
 	private final boolean srtmDisabled;
 	private final boolean srtmNeedsInstallation;
@@ -83,8 +84,8 @@ public class MapDataMenuController extends MenuController {
 			backuped = localItem.isBackuped(app);
 			LocalIndexHelper helper = new LocalIndexHelper(app);
 			otherLocalItems = helper.getLocalItems(mapObject.getWorldRegion().getRegionDownloadName());
-			for (Iterator<LocalItem> iterator = otherLocalItems.iterator(); iterator.hasNext(); ) {
-				LocalItem info = iterator.next();
+			for (Iterator<LocalFileItem> iterator = otherLocalItems.iterator(); iterator.hasNext(); ) {
+				LocalFileItem info = iterator.next();
 				if (info.getPath().equals(localItem.getPath())) {
 					iterator.remove();
 					break;
@@ -151,7 +152,7 @@ public class MapDataMenuController extends MenuController {
 									provider);
 						}
 					} else if (otherLocalItems != null && otherLocalItems.size() > 0) {
-						for (LocalItem info : otherLocalItems) {
+						for (LocalFileItem info : otherLocalItems) {
 							selectedObjects.put(
 									new DownloadMapObject(mapObject.getDataObject(), mapObject.getWorldRegion(), null, info),
 									provider);
@@ -379,7 +380,7 @@ public class MapDataMenuController extends MenuController {
 			DateFormat dateFormat = android.text.format.DateFormat.getMediumDateFormat(mapActivity);
 			addPlainMenuItem(R.drawable.ic_action_data, null, indexItem.getRemoteDate(dateFormat), false, false, null);
 		} else if (localItem != null) {
-			addPlainMenuItem(R.drawable.ic_action_data, null, localItem.getDescription(mapActivity.getMyApplication()), false, false, null);
+			addPlainMenuItem(R.drawable.ic_action_data, null, LocalItemUtils.getItemDescription(mapActivity, localItem), false, false, null);
 		}
 	}
 
@@ -603,10 +604,10 @@ public class MapDataMenuController extends MenuController {
 		private final WeakReference<MapActivity> mapActivityRef;
 		private final OsmandApplication app;
 
-		private LocalItem localItem;
+		private LocalFileItem localItem;
 		private IndexItem indexItem;
 
-		RestoreFromBackupTask(@NonNull MapActivity mapActivity, @NonNull LocalItem LocalItem) {
+		RestoreFromBackupTask(@NonNull MapActivity mapActivity, @NonNull LocalFileItem LocalItem) {
 			this.mapActivityRef = new WeakReference<>(mapActivity);
 			this.app = mapActivity.getMyApplication();
 			this.localItem = LocalItem;
@@ -629,7 +630,7 @@ public class MapDataMenuController extends MenuController {
 		@Override
 		protected Void doInBackground(Void... params) {
 			if (localItem != null) {
-				LocalItem info = localItem;
+				LocalFileItem info = localItem;
 				if (move(new File(info.getPath()), getFileToRestore(info))) {
 					app.getResourceManager().reloadIndexes(IProgress.EMPTY_PROGRESS, new ArrayList<>());
 					app.getDownloadThread().updateLoadedFiles();
@@ -651,7 +652,7 @@ public class MapDataMenuController extends MenuController {
 		}
 
 		@NonNull
-		private File getFileToRestore(@NonNull LocalItem item) {
+		private File getFileToRestore(@NonNull LocalFileItem item) {
 			String fileName = item.getFileName();
 			if (item.isBackuped(app)) {
 				File parent = new File(item.getPath()).getParentFile();

@@ -5,12 +5,13 @@ import androidx.annotation.NonNull;
 import net.osmand.Collator;
 import net.osmand.OsmAndCollator;
 import net.osmand.plus.OsmandApplication;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
+import net.osmand.plus.download.local.LocalItemUtils;
 import net.osmand.plus.settings.enums.MapsSortMode;
 
 import java.util.Comparator;
 
-public class MapsComparator implements Comparator<LocalItem> {
+public class MapsComparator implements Comparator<LocalFileItem> {
 
 	public final OsmandApplication app;
 	public final MapsSortMode sortMode;
@@ -22,7 +23,7 @@ public class MapsComparator implements Comparator<LocalItem> {
 	}
 
 	@Override
-	public int compare(LocalItem item1, LocalItem item2) {
+	public int compare(LocalFileItem item1, LocalFileItem item2) {
 		switch (sortMode) {
 			case NAME_ASCENDING:
 			case COUNTRY_NAME_ASCENDING:
@@ -42,8 +43,8 @@ public class MapsComparator implements Comparator<LocalItem> {
 		return 0;
 	}
 
-	private int compareItemNames(@NonNull LocalItem item1, @NonNull LocalItem item2) {
-		return compareNames(item1.getName(app).toString(), item2.getName(app).toString());
+	private int compareItemNames(@NonNull LocalFileItem item1, @NonNull LocalFileItem item2) {
+		return compareNames(LocalItemUtils.getItemName(app, item1).toString(), LocalItemUtils.getItemName(app, item2).toString());
 	}
 
 	private int compareNames(@NonNull String name1, @NonNull String name2) {

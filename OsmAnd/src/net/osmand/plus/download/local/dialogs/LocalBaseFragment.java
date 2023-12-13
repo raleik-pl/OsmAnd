@@ -17,7 +17,7 @@ import net.osmand.plus.download.DownloadIndexesThread.DownloadEvents;
 import net.osmand.plus.download.IndexItem;
 import net.osmand.plus.download.local.CategoryType;
 import net.osmand.plus.download.local.LocalCategory;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalOperationTask;
 import net.osmand.plus.download.local.LocalOperationTask.OperationListener;
 import net.osmand.plus.download.local.OperationType;
@@ -88,11 +88,11 @@ public abstract class LocalBaseFragment extends BaseOsmAndFragment implements Op
 	}
 
 	@Override
-	public void onDeletionConfirmed(@NonNull LocalItem localItem) {
+	public void onDeletionConfirmed(@NonNull LocalFileItem localItem) {
 		performOperation(DELETE_OPERATION, localItem);
 	}
 
-	public void performOperation(@NonNull OperationType type, @NonNull LocalItem... items) {
+	public void performOperation(@NonNull OperationType type, @NonNull LocalFileItem... items) {
 		LocalOperationTask task = new LocalOperationTask(app, type, this);
 		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, items);
 	}

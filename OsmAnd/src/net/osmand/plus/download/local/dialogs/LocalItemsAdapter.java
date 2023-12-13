@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import net.osmand.plus.R;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.dialogs.viewholders.HeaderViewHolder;
 import net.osmand.plus.download.local.dialogs.viewholders.LocalItemHolder;
 import net.osmand.plus.download.local.dialogs.viewholders.MemoryViewHolder;
@@ -79,7 +79,7 @@ public class LocalItemsAdapter extends RecyclerView.Adapter<ViewHolder> {
 			MemoryViewHolder viewHolder = (MemoryViewHolder) holder;
 			viewHolder.bindView(memoryInfo, !hideDivider);
 		} else if (holder instanceof LocalItemHolder) {
-			LocalItem item = (LocalItem) items.get(position);
+			LocalFileItem item = (LocalFileItem) items.get(position);
 			boolean lastItem = position == getItemCount() - 1;
 			boolean hideDivider = !lastItem && items.get(position + 1) instanceof HeaderGroup;
 
@@ -96,7 +96,7 @@ public class LocalItemsAdapter extends RecyclerView.Adapter<ViewHolder> {
 	@Override
 	public int getItemViewType(int position) {
 		Object object = items.get(position);
-		if (object instanceof LocalItem) {
+		if (object instanceof LocalFileItem) {
 			return LIST_ITEM_TYPE;
 		} else if (object instanceof HeaderGroup) {
 			return LIST_HEADER_TYPE;
@@ -124,19 +124,19 @@ public class LocalItemsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
 	public interface LocalItemListener {
 
-		default boolean isItemSelected(@NonNull LocalItem item) {
+		default boolean isItemSelected(@NonNull LocalFileItem item) {
 			return false;
 		}
 
-		default boolean itemUpdateAvailable(@NonNull LocalItem item) {
+		default boolean itemUpdateAvailable(@NonNull LocalFileItem item) {
 			return false;
 		}
 
-		default void onItemSelected(@NonNull LocalItem item) {
+		default void onItemSelected(@NonNull LocalFileItem item) {
 
 		}
 
-		default void onItemOptionsSelected(@NonNull LocalItem item, @NonNull View view) {
+		default void onItemOptionsSelected(@NonNull LocalFileItem item, @NonNull View view) {
 
 		}
 	}

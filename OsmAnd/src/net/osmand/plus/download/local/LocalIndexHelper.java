@@ -121,13 +121,13 @@ public class LocalIndexHelper {
 				category = new LocalCategory(categoryType);
 				categories.put(categoryType, category);
 			}
-			LocalItem item = new LocalItem(file, itemType);
+			LocalFileItem item = new LocalFileItem(file, itemType);
 			LocalItemUtils.updateItem(app, item);
 			category.addLocalItem(item);
 		}
 	}
 
-	private void collectLocalItems(@NonNull List<LocalItem> items, @NonNull LocalItemType type,
+	private void collectLocalItems(@NonNull List<LocalFileItem> items, @NonNull LocalItemType type,
 	                               @NonNull String downloadName, boolean backuped) {
 		String name = Algorithms.capitalizeFirstLetterAndLowercase(downloadName);
 		if (type == MAP_DATA) {
@@ -147,7 +147,7 @@ public class LocalIndexHelper {
 		}
 	}
 
-	private void addLocalItem(@NonNull List<LocalItem> items, @NonNull LocalItemType type, @NonNull String name,
+	private void addLocalItem(@NonNull List<LocalFileItem> items, @NonNull LocalItemType type, @NonNull String name,
 	                          @NonNull String dirName, @NonNull String extension, boolean backuped) {
 		dirName = backuped ? BACKUP_INDEX_DIR : dirName;
 		File file = app.getAppPath(dirName + name + extension);
@@ -157,8 +157,8 @@ public class LocalIndexHelper {
 	}
 
 	@NonNull
-	public List<LocalItem> getLocalItems(@NonNull String downloadName) {
-		List<LocalItem> items = new ArrayList<>();
+	public List<LocalFileItem> getLocalItems(@NonNull String downloadName) {
+		List<LocalFileItem> items = new ArrayList<>();
 
 		collectLocalItems(items, downloadName, false);
 		collectLocalItems(items, downloadName, true);
@@ -166,7 +166,7 @@ public class LocalIndexHelper {
 		return items;
 	}
 
-	private void collectLocalItems(@NonNull List<LocalItem> items, @NonNull String downloadName, boolean backuped) {
+	private void collectLocalItems(@NonNull List<LocalFileItem> items, @NonNull String downloadName, boolean backuped) {
 		for (LocalItemType type : getSuggestedItemTypes()) {
 			collectLocalItems(items, type, downloadName, backuped);
 		}
@@ -185,10 +185,10 @@ public class LocalIndexHelper {
 	}
 
 	@NonNull
-	public List<LocalItem> getLocalIndexItems(boolean readFiles, boolean shouldUpdate,
-	                                          @Nullable AbstractLoadLocalIndexTask task,
-	                                          @NonNull LocalItemType... types) {
-		List<LocalItem> items = new ArrayList<>();
+	public List<LocalFileItem> getLocalIndexItems(boolean readFiles, boolean shouldUpdate,
+	                                              @Nullable AbstractLoadLocalIndexTask task,
+	                                              @NonNull LocalItemType... types) {
+		List<LocalFileItem> items = new ArrayList<>();
 		Map<String, File> indexFiles = resourceManager.getIndexFiles();
 
 		boolean voicesCollected = false;
@@ -240,9 +240,9 @@ public class LocalIndexHelper {
 	}
 
 	@NonNull
-	public List<LocalItem> getLocalFullMaps(@Nullable AbstractLoadLocalIndexTask task) {
-		List<LocalItem> results = new ArrayList<>();
-		List<LocalItem> roadOnlyList = new ArrayList<>();
+	public List<LocalFileItem> getLocalFullMaps(@Nullable AbstractLoadLocalIndexTask task) {
+		List<LocalFileItem> results = new ArrayList<>();
+		List<LocalFileItem> roadOnlyList = new ArrayList<>();
 
 		Map<String, File> indexFiles = resourceManager.getIndexFiles();
 		loadObfData(app.getAppInternalPath(HIDDEN_DIR), results, true, true, indexFiles, task);
@@ -254,7 +254,7 @@ public class LocalIndexHelper {
 		return results;
 	}
 
-	public void loadVoiceData(@NonNull File dir, @NonNull List<LocalItem> items, boolean readFiles,
+	public void loadVoiceData(@NonNull File dir, @NonNull List<LocalFileItem> items, boolean readFiles,
 	                          boolean shouldUpdate, @NonNull Map<String, File> indexFiles,
 	                          @Nullable AbstractLoadLocalIndexTask task) {
 		if (readFiles && dir.canRead()) {
@@ -276,7 +276,7 @@ public class LocalIndexHelper {
 		}
 	}
 
-	private void loadVoiceDataImpl(@NonNull File[] files, @NonNull List<LocalItem> items,
+	private void loadVoiceDataImpl(@NonNull File[] files, @NonNull List<LocalFileItem> items,
 	                               boolean shouldUpdate, @Nullable AbstractLoadLocalIndexTask task) {
 		List<File> voiceFilesList = new ArrayList<>(Arrays.asList(files));
 		//First list TTS files, they are preferred
@@ -296,12 +296,12 @@ public class LocalIndexHelper {
 		}
 	}
 
-	private void loadFontData(@NonNull File dir, @NonNull List<LocalItem> items, boolean readFiles,
+	private void loadFontData(@NonNull File dir, @NonNull List<LocalFileItem> items, boolean readFiles,
 	                          boolean shouldUpdate, @NonNull Map<String, File> indexFiles, @Nullable AbstractLoadLocalIndexTask task) {
 		loadDataImpl(dir, FONT_DATA, FONT_INDEX_EXT, readFiles, shouldUpdate, items, indexFiles, task);
 	}
 
-	private void loadTilesData(@NonNull File dir, @NonNull List<LocalItem> items,
+	private void loadTilesData(@NonNull File dir, @NonNull List<LocalFileItem> items,
 	                           boolean shouldUpdate, @Nullable AbstractLoadLocalIndexTask task) {
 		if (dir.canRead()) {
 			for (File file : listFilesSorted(dir)) {
@@ -328,7 +328,7 @@ public class LocalIndexHelper {
 		return listFiles;
 	}
 
-	private void loadObfData(@NonNull File dir, @NonNull List<LocalItem> items, boolean readFiles,
+	private void loadObfData(@NonNull File dir, @NonNull List<LocalFileItem> items, boolean readFiles,
 	                         boolean shouldUpdate, @NonNull Map<String, File> indexFiles,
 	                         @Nullable AbstractLoadLocalIndexTask task) {
 		if ((readFiles) && dir.canRead()) {
@@ -354,7 +354,7 @@ public class LocalIndexHelper {
 	}
 
 	private void loadDataImpl(@NonNull File dir, @NonNull LocalItemType type, @NonNull String extension,
-	                          boolean readFiles, boolean shouldUpdate, @NonNull List<LocalItem> items,
+	                          boolean readFiles, boolean shouldUpdate, @NonNull List<LocalFileItem> items,
 	                          @NonNull Map<String, File> indexFiles, @Nullable AbstractLoadLocalIndexTask task) {
 		if ((readFiles) && dir.canRead()) {
 			for (File file : listFilesSorted(dir)) {
@@ -372,9 +372,9 @@ public class LocalIndexHelper {
 		}
 	}
 
-	private void loadLocalData(@NonNull File file, @NonNull LocalItemType type, @NonNull List<LocalItem> items,
+	private void loadLocalData(@NonNull File file, @NonNull LocalItemType type, @NonNull List<LocalFileItem> items,
 	                           boolean shouldUpdate, @Nullable AbstractLoadLocalIndexTask task) {
-		LocalItem item = new LocalItem(file, type);
+		LocalFileItem item = new LocalFileItem(file, type);
 		if (shouldUpdate) {
 			LocalItemUtils.updateItem(app, item);
 		}

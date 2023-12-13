@@ -1,7 +1,7 @@
 package net.osmand.plus.download.ui;
 
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 
 public interface AbstractLoadLocalIndexTask {
-	void loadFile(LocalItem... loaded);
+	void loadFile(LocalFileItem... loaded);
 }

@@ -39,7 +39,7 @@ import net.osmand.plus.backup.NetworkSettingsHelper;
 import net.osmand.plus.base.MapViewTrackingUtilities;
 import net.osmand.plus.base.dialog.DialogManager;
 import net.osmand.plus.download.local.LocalIndexHelper;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.feedback.AnalyticsHelper;
 import net.osmand.plus.feedback.FeedbackHelper;
 import net.osmand.plus.helpers.AvoidSpecificRoads;
@@ -583,9 +583,9 @@ public class AppInitializer implements IProgress {
 			return;
 		}
 		LocalIndexHelper helper = new LocalIndexHelper(app);
-		List<LocalItem> fullMaps = helper.getLocalFullMaps(null);
+		List<LocalFileItem> fullMaps = helper.getLocalFullMaps(null);
 		AlarmManager alarmMgr = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
-		for (LocalItem item : fullMaps) {
+		for (LocalFileItem item : fullMaps) {
 			String fileName = item.getFileName();
 			if (!preferenceForLocalIndex(fileName, settings).get()) {
 				continue;

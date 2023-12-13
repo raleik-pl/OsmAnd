@@ -17,7 +17,7 @@ import net.osmand.map.WorldRegion;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
 import net.osmand.plus.download.local.LocalIndexHelper;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.download.local.LocalItemType;
 import net.osmand.plus.helpers.AvoidSpecificRoads.AvoidRoadInfo;
 import net.osmand.plus.helpers.FileNameTranslationHelper;
@@ -382,7 +382,7 @@ public abstract class SettingsHelper {
 		if (!iTileSources.isEmpty() || addEmptyItems) {
 			resourcesItems.put(ExportSettingsType.MAP_SOURCES, iTileSources);
 		}
-		List<LocalItem> localItems;
+		List<LocalFileItem> localItems;
 		List<LocalItemType> dataTypes = new ArrayList<>();
 		if (settingsTypes == null || settingsTypes.contains(ExportSettingsType.OFFLINE_MAPS)) {
 			dataTypes.add(LocalItemType.MAP_DATA);
@@ -422,14 +422,14 @@ public abstract class SettingsHelper {
 	}
 
 	@NonNull
-	private List<LocalItem> getLocalIndexData(@NonNull LocalItemType... types) {
+	private List<LocalFileItem> getLocalIndexData(@NonNull LocalItemType... types) {
 		LocalIndexHelper indexHelper = new LocalIndexHelper(app);
-		List<LocalItem> items = indexHelper.getLocalIndexItems(true, false, null, types);
+		List<LocalFileItem> items = indexHelper.getLocalIndexItems(true, false, null, types);
 
 		String miniBaseMapName = WorldRegion.WORLD_BASEMAP_MINI + IndexConstants.BINARY_MAP_INDEX_EXT;
-		Iterator<LocalItem> iterator = items.iterator();
+		Iterator<LocalFileItem> iterator = items.iterator();
 		while (iterator.hasNext()) {
-			LocalItem indexInfo = iterator.next();
+			LocalFileItem indexInfo = iterator.next();
 			if (LocalItemType.MAP_DATA == indexInfo.getType() && miniBaseMapName.equalsIgnoreCase(indexInfo.getFileName())) {
 				iterator.remove();
 			}
@@ -439,9 +439,9 @@ public abstract class SettingsHelper {
 	}
 
 	@NonNull
-	private List<File> getFilesByType(@NonNull List<LocalItem> localItems, LocalItemType... types) {
+	private List<File> getFilesByType(@NonNull List<LocalFileItem> localItems, LocalItemType... types) {
 		List<File> files = new ArrayList<>();
-		for (LocalItem info : localItems) {
+		for (LocalFileItem info : localItems) {
 			File file = new File(info.getPath());
 			boolean filtered = false;
 			for (LocalItemType type : types) {

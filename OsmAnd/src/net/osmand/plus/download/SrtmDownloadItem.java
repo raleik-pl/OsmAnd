@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import net.osmand.IndexConstants;
 import net.osmand.plus.OsmandApplication;
 import net.osmand.plus.R;
-import net.osmand.plus.download.local.LocalItem;
+import net.osmand.plus.download.local.LocalFileItem;
 import net.osmand.plus.settings.enums.MetricsConstants;
 import net.osmand.util.Algorithms;
 
@@ -208,8 +208,8 @@ public class SrtmDownloadItem extends DownloadItem {
 	private static boolean isMetricItem(Object item) {
 		if (item instanceof IndexItem) {
 			return ((IndexItem) item).getFileName().endsWith(BINARY_SRTM_MAP_INDEX_EXT_ZIP);
-		} else if (item instanceof LocalItem) {
-			return ((LocalItem) item).getFileName().endsWith(BINARY_SRTM_MAP_INDEX_EXT);
+		} else if (item instanceof LocalFileItem) {
+			return ((LocalFileItem) item).getFileName().endsWith(BINARY_SRTM_MAP_INDEX_EXT);
 		} else if (item instanceof SrtmDownloadItem) {
 			return isMetricItem(((SrtmDownloadItem) item).getIndexItem());
 		} else if (item instanceof MultipleDownloadItem) {
